@@ -1,55 +1,47 @@
 /**
  * scripts.js - Walter Medor
- * Version Finale avec Forçage de Favicon (Cache-Busting)
+ * Version Finale Corrigée pour l'URL waltermedor.github.io
  */
 
-// --- 1. FONCTIONS DE CHARGEMENT ---
+// 1. LE CHEMIN EXACT DE TON REPO GITHUB
+const REPO_NAME = "/waltermedor.github.io";
 
-function loadComponent(id, url) {
+function loadComponent(id, fileName) {
     const element = document.getElementById(id);
-    if (!element) return Promise.reject("Élément non trouvé");
+    if (!element) return;
 
-    return fetch(url)
+    // Construction du chemin : /waltermedor.github.io/header.html
+    const url = REPO_NAME + "/" + fileName;
+
+    fetch(url)
         .then(response => {
-            if (!response.ok) throw new Error(`Erreur ${response.status} : ${url}`);
+            if (!response.ok) throw new Error("404 : " + url);
             return response.text();
         })
         .then(data => {
             element.innerHTML = data;
-            console.log(`✅ Composant [${id}] chargé.`);
+            console.log(`✅ ${id} chargé depuis : ${url}`);
         })
-        .catch(error => {
-            console.error(`❌ Erreur :`, error);
-        });
+        .catch(error => console.error(`❌ Erreur :`, error));
 }
 
-// --- 2. INITIALISATION PRINCIPALE ---
-
+// 2. INITIALISATION
 document.addEventListener("DOMContentLoaded", () => {
-    
-    // Chargement Header/Footer
-    loadComponent("main-header", "/header.html");
-    loadComponent("main-footer", "/footer.html");
+    // Chargement des composants
+    loadComponent("main-header", "header.html");
+    loadComponent("main-footer", "footer.html");
 
-    // --- FORCE LE RECHARGEMENT DU FAVICON ---
-    const updateFavicon = () => {
-        // Supprime les anciens liens de favicon pour éviter les doublons
-        const existingFavicons = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
-        existingFavicons.forEach(el => el.remove());
+    // FIX DU FAVICON
+    let favicon = document.querySelector('link[rel="icon"]');
+    if (!favicon) {
+        favicon = document.createElement('link');
+        favicon.rel = 'icon';
+        document.head.appendChild(favicon);
+    }
+    favicon.type = 'image/png';
+    // Utilisation du chemin complet avec le bon nom de repo
+    favicon.href = REPO_NAME + "/Images/icon.png"; 
 
-        const newFavicon = document.createElement('link');
-        newFavicon.rel = 'icon';
-        newFavicon.type = 'image/png';
-        
-        // L'astuce du "?v=" force le navigateur à voir l'image comme un nouveau fichier
-        const timestamp = new Date().getTime();
-        newFavicon.href = "/Images/icon.png?v=" + timestamp; 
-        
-        document.head.appendChild(newFavicon);
-        console.log("🚀 Tentative de forçage du favicon : " + newFavicon.href);
-    };
-
-    updateFavicon();
     initAudioPlayers();
 });
 
@@ -57,8 +49,7 @@ window.onload = () => {
     initInfiniteCarousel();
 };
 
-// --- 3. GESTION DU CARROUSEL ---
-
+// 3. CARROUSEL
 function initInfiniteCarousel() {
     const track = document.querySelector('.carousel-slide');
     const items = document.querySelectorAll('.carousel-slide img');
@@ -72,6 +63,7 @@ function initInfiniteCarousel() {
     }
 
     function move() {
+        if (!items[0]) return;
         const itemWidth = items[0].clientWidth + gap;
         index++;
         track.style.transition = "transform 0.5s ease-in-out";
@@ -88,8 +80,7 @@ function initInfiniteCarousel() {
     setInterval(move, 4000);
 }
 
-// --- 4. GESTION DE L'AUDIO ---
-
+// 4. AUDIO
 function initAudioPlayers() {
     const players = document.querySelectorAll('.custom-player');
     players.forEach(player => {
