@@ -1,21 +1,22 @@
 /**
  * scripts.js - Walter Medor
- * Version Finale Corrigée pour l'URL waltermedor.github.io
+ * Version AUTO-DETECT : Gère automatiquement les chemins (Local vs GitHub)
  */
 
-// 1. LE CHEMIN EXACT DE TON REPO GITHUB
-const REPO_NAME = "/waltermedor.github.io";
+// 1. AUTOMATISATION DU CHEMIN (BASE PATH)
+const isGitHub = window.location.hostname.includes('github.io');
+const BASE_PATH = isGitHub ? '/waltermedor' : '';
 
+// 2. FONCTION DE CHARGEMENT GÉNÉRIQUE
 function loadComponent(id, fileName) {
     const element = document.getElementById(id);
-    if (!element) return;
+    if (!element) return Promise.resolve(); // Évite de bloquer si l'ID n'existe pas
 
-    // Construction du chemin : /waltermedor.github.io/header.html
-    const url = REPO_NAME + "/" + fileName;
+    const url = `${BASE_PATH}/${fileName}`;
 
-    fetch(url)
+    return fetch(url)
         .then(response => {
-            if (!response.ok) throw new Error("404 : " + url);
+            if (!response.ok) throw new Error(`404: ${url}`);
             return response.text();
         })
         .then(data => {
@@ -25,46 +26,60 @@ function loadComponent(id, fileName) {
         .catch(error => console.error(`❌ Erreur :`, error));
 }
 
-// 2. INITIALISATION
+// 3. INITIALISATION AU CHARGEMENT DU DOM
+const favicon = document.createElement('link');
+favicon.rel = 'icon';
+favicon.type = 'image/png';
+favicon.href = '../Images/icon.png'; 
+document.head.appendChild(favicon);
+
 document.addEventListener("DOMContentLoaded", () => {
-    // Chargement des composants
-    loadComponent("main-header", "header.html");
-    loadComponent("main-footer", "footer.html");
-
-    // FIX DU FAVICON
-    let favicon = document.querySelector('link[rel="icon"]');
-    if (!favicon) {
-        favicon = document.createElement('link');
-        favicon.rel = 'icon';
-        document.head.appendChild(favicon);
+    
+    // 2. Calcul dynamique des chemins pour le header/footer
+    const path = window.location.pathname;
+    const depth = path.split('/').filter(p => p.length > 0 && !p.includes('.html')).length;
+    
+    let prefix = "";
+    if (depth > 0) {
+        prefix = "../".repeat(depth);
     }
-    favicon.type = 'image/png';
-    // Utilisation du chemin complet avec le bon nom de repo
-    favicon.href = REPO_NAME + "/Images/icon.png"; 
 
+    // 3. Chargement des composants HTML
+    loadComponent("main-header", `${prefix}header.html`);
+    loadComponent("main-footer", `${prefix}footer.html`);
+
+    // 4. Initialisation des lecteurs audio
     initAudioPlayers();
 });
 
+// 4. INITIALISATION DU CARROUSEL
 window.onload = () => {
     initInfiniteCarousel();
 };
 
-// 3. CARROUSEL
+// 5. GESTION DU CARROUSEL
 function initInfiniteCarousel() {
     const track = document.querySelector('.carousel-slide');
     const items = document.querySelectorAll('.carousel-slide img');
+    const nextBtn = document.querySelector('.next');
+    const prevBtn = document.querySelector('.prev');
+    
     if (!track || items.length === 0) return;
 
     const gap = 20;
     let index = 0;
 
     if (track.children.length === items.length) {
-        items.forEach(item => track.appendChild(item.cloneNode(true)));
+        items.forEach(item => {
+            const clone = item.cloneNode(true);
+            track.appendChild(clone);
+        });
     }
 
     function move() {
-        if (!items[0]) return;
         const itemWidth = items[0].clientWidth + gap;
+        if (itemWidth <= gap) return; 
+
         index++;
         track.style.transition = "transform 0.5s ease-in-out";
         track.style.transform = `translateX(${-index * itemWidth}px)`;
@@ -77,12 +92,31 @@ function initInfiniteCarousel() {
             }, 500);
         }
     }
+
+    if (nextBtn) nextBtn.addEventListener('click', move);
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            const itemWidth = items[0].clientWidth + gap;
+            if (index <= 0) {
+                index = items.length;
+                track.style.transition = "none";
+                track.style.transform = `translateX(${-index * itemWidth}px)`;
+            }
+            setTimeout(() => {
+                index--;
+                track.style.transition = "transform 0.5s ease-in-out";
+                track.style.transform = `translateX(${-index * itemWidth}px)`;
+            }, 10);
+        });
+    }
+
     setInterval(move, 4000);
 }
 
-// 4. AUDIO
+// 6. GESTION DE L'AUDIO
 function initAudioPlayers() {
     const players = document.querySelectorAll('.custom-player');
+
     players.forEach(player => {
         const audio = player.querySelector('audio');
         const btn = player.querySelector('.play-pause-btn');
@@ -93,7 +127,11 @@ function initAudioPlayers() {
 
         btn.addEventListener('click', () => {
             if (audio.paused) {
-                document.querySelectorAll('audio').forEach(a => a.pause());
+                document.querySelectorAll('audio').forEach(a => {
+                    a.pause();
+                    const otherBtn = a.parentElement.querySelector('.play-pause-btn');
+                    if (otherBtn) otherBtn.innerText = "▶";
+                });
                 audio.play();
                 btn.innerText = "II";
             } else {
