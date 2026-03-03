@@ -1,75 +1,78 @@
 /**
  * scripts.js - Walter Medor
- * Version AUTO-DETECT : Gère automatiquement les chemins (Local vs GitHub)
+ * Version Finale avec Forçage de Favicon (Cache-Busting)
  */
 
-// 1. AUTOMATISATION DU CHEMIN (BASE PATH)
-const isGitHub = window.location.hostname.includes('github.io');
-const BASE_PATH = isGitHub ? '/waltermedor' : '';
+// --- 1. FONCTIONS DE CHARGEMENT ---
 
-// 2. FONCTION DE CHARGEMENT GÉNÉRIQUE
-function loadComponent(id, fileName) {
+function loadComponent(id, url) {
     const element = document.getElementById(id);
-    if (!element) return Promise.resolve(); // Évite de bloquer si l'ID n'existe pas
-
-    const url = `${BASE_PATH}/${fileName}`;
+    if (!element) return Promise.reject("Élément non trouvé");
 
     return fetch(url)
         .then(response => {
-            if (!response.ok) throw new Error(`404: ${url}`);
+            if (!response.ok) throw new Error(`Erreur ${response.status} : ${url}`);
             return response.text();
         })
         .then(data => {
             element.innerHTML = data;
-            console.log(`✅ ${id} chargé depuis : ${url}`);
+            console.log(`✅ Composant [${id}] chargé.`);
         })
-        .catch(error => console.error(`❌ Erreur :`, error));
+        .catch(error => {
+            console.error(`❌ Erreur :`, error);
+        });
 }
 
-// 3. INITIALISATION AU CHARGEMENT DU DOM
+// --- 2. INITIALISATION PRINCIPALE ---
+
 document.addEventListener("DOMContentLoaded", () => {
-    // Chargement automatique
-    loadComponent("main-header", "header.html");
-    loadComponent("main-footer", "footer.html");
+    
+    // Chargement Header/Footer
+    loadComponent("main-header", "/header.html");
+    loadComponent("main-footer", "/footer.html");
 
-    // Injection automatique du Favicon
-    const favicon = document.createElement('link');
-    favicon.rel = 'icon';
-    favicon.type = 'image/png';
-    favicon.href = `${BASE_PATH}/Images/icon.png`; 
-    document.head.appendChild(favicon);
+    // --- FORCE LE RECHARGEMENT DU FAVICON ---
+    const updateFavicon = () => {
+        // Supprime les anciens liens de favicon pour éviter les doublons
+        const existingFavicons = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
+        existingFavicons.forEach(el => el.remove());
 
+        const newFavicon = document.createElement('link');
+        newFavicon.rel = 'icon';
+        newFavicon.type = 'image/png';
+        
+        // L'astuce du "?v=" force le navigateur à voir l'image comme un nouveau fichier
+        const timestamp = new Date().getTime();
+        newFavicon.href = "/Images/icon.png?v=" + timestamp; 
+        
+        document.head.appendChild(newFavicon);
+        console.log("🚀 Tentative de forçage du favicon : " + newFavicon.href);
+    };
+
+    updateFavicon();
     initAudioPlayers();
 });
 
-// 4. INITIALISATION DU CARROUSEL
 window.onload = () => {
     initInfiniteCarousel();
 };
 
-// 5. GESTION DU CARROUSEL
+// --- 3. GESTION DU CARROUSEL ---
+
 function initInfiniteCarousel() {
     const track = document.querySelector('.carousel-slide');
     const items = document.querySelectorAll('.carousel-slide img');
-    const nextBtn = document.querySelector('.next');
-    const prevBtn = document.querySelector('.prev');
-    
     if (!track || items.length === 0) return;
 
     const gap = 20;
     let index = 0;
 
     if (track.children.length === items.length) {
-        items.forEach(item => {
-            const clone = item.cloneNode(true);
-            track.appendChild(clone);
-        });
+        items.forEach(item => track.appendChild(item.cloneNode(true)));
     }
 
     function move() {
         const itemWidth = items[0].clientWidth + gap;
-        if (itemWidth <= gap) return; 
-
         index++;
         track.style.transition = "transform 0.5s ease-in-out";
         track.style.transform = `translateX(${-index * itemWidth}px)`;
@@ -82,31 +85,13 @@ function initInfiniteCarousel() {
             }, 500);
         }
     }
-
-    if (nextBtn) nextBtn.addEventListener('click', move);
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            const itemWidth = items[0].clientWidth + gap;
-            if (index <= 0) {
-                index = items.length;
-                track.style.transition = "none";
-                track.style.transform = `translateX(${-index * itemWidth}px)`;
-            }
-            setTimeout(() => {
-                index--;
-                track.style.transition = "transform 0.5s ease-in-out";
-                track.style.transform = `translateX(${-index * itemWidth}px)`;
-            }, 10);
-        });
-    }
-
     setInterval(move, 4000);
 }
 
-// 6. GESTION DE L'AUDIO
+// --- 4. GESTION DE L'AUDIO ---
+
 function initAudioPlayers() {
     const players = document.querySelectorAll('.custom-player');
-
     players.forEach(player => {
         const audio = player.querySelector('audio');
         const btn = player.querySelector('.play-pause-btn');
@@ -117,11 +102,7 @@ function initAudioPlayers() {
 
         btn.addEventListener('click', () => {
             if (audio.paused) {
-                document.querySelectorAll('audio').forEach(a => {
-                    a.pause();
-                    const otherBtn = a.parentElement.querySelector('.play-pause-btn');
-                    if (otherBtn) otherBtn.innerText = "▶";
-                });
+                document.querySelectorAll('audio').forEach(a => a.pause());
                 audio.play();
                 btn.innerText = "II";
             } else {
