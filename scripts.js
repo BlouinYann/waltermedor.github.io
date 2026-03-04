@@ -1,11 +1,7 @@
-/**
- * scripts.js - Walter Medor
- * Version AUTO-DETECT : Gère automatiquement les chemins (Local vs GitHub)
- */
-
 // 1. AUTOMATISATION DU CHEMIN (BASE PATH)
 const isGitHub = window.location.hostname.includes('github.io');
-const BASE_PATH = isGitHub ? '/waltermedor' : '';
+// On utilise le nom exact du dépôt GitHub
+const BASE_PATH = isGitHub ? '/waltermedor.github.io' : '';
 
 // 2. FONCTION DE CHARGEMENT GÉNÉRIQUE
 function loadComponent(id, fileName) {
