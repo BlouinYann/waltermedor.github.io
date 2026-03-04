@@ -1,11 +1,11 @@
 /**
  * scripts.js - Walter Medor
- * Version UNIFIÉE : Utilise BASE_PATH pour tous les chargements
+ * Version UNIFIÉE : Utilise BASE_PATH pour corriger les erreurs 404 sur GitHub
  */
 
-// 1. DÉTERMINATION DE LA RACINE DU SITE
+// 1. DÉFINITION DE LA RACINE DU PROJET
 const isGitHub = window.location.hostname.includes('github.io');
-// Remplacez 'waltermedor.github.io' par le nom exact de votre dépôt si nécessaire
+// On utilise le nom exact du dépôt pour GitHub, rien pour le local
 const BASE_PATH = isGitHub ? '/waltermedor.github.io' : '';
 
 // 2. FONCTION DE CHARGEMENT GÉNÉRIQUE
@@ -13,7 +13,7 @@ function loadComponent(id, fileName) {
     const element = document.getElementById(id);
     if (!element) return Promise.resolve();
 
-    // On part TOUJOURS de la racine définie par BASE_PATH
+    // On combine BASE_PATH (racine du dépôt) avec le nom du fichier
     const url = `${BASE_PATH}/${fileName}`;
 
     return fetch(url)
@@ -28,19 +28,19 @@ function loadComponent(id, fileName) {
         .catch(error => console.error(`❌ Erreur :`, error));
 }
 
-// 3. INITIALISATION AU CHARGEMENT DU DOM
+// 3. INITIALISATION
 document.addEventListener("DOMContentLoaded", () => {
     
-    // Favicon dynamique
+    // Favicon dynamique utilisant la base du projet
     const favicon = document.createElement('link');
     favicon.rel = 'icon';
     favicon.type = 'image/png';
     favicon.href = `${BASE_PATH}/Images/icon.png`; 
     document.head.appendChild(favicon);
 
-    // Chargement des composants HTML via le chemin absolu du projet
-    loadComponent("main-header", `header.html`);
-    loadComponent("main-footer", `footer.html`);
+    // Chargement des composants SANS calcul de "prefix" variable
+    loadComponent("main-header", "header.html");
+    loadComponent("main-footer", "footer.html");
 
     // Initialisation des lecteurs audio
     initAudioPlayers();
@@ -50,6 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
 window.onload = () => {
     initInfiniteCarousel();
 };
+
+// --- Gardez vos fonctions initInfiniteCarousel() et initAudioPlayers() ici ---
 
 
 // 5. GESTION DU CARROUSEL
