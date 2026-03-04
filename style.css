@@ -1,28 +1,32 @@
 /* --- CONFIGURATION DES POLICES ET COULEURS --- */
 :root {
     --bg-color: #1a1a1a;
-    --color-primary: #635143;    /* Marron foncé */
-    --color-secondary: #93805f;  /* Marron clair */
+    --color-primary: #635143;
+    /* Marron foncé */
+    --color-secondary: #93805f;
+    /* Marron clair */
     --color-white: #e6e2df;
-    
+
     --font-title: 'LinoStamp', bold;
     --font-subtitle: 'KingthingsTrypewriter2', monospace;
     --font-body: 'BebasNeue', sans-serif;
 }
 
 /* Importation des polices */
-@font-face { 
-    font-family: 'LinoStamp'; 
-    src: url('Polices/LinoStamp.ttf') format('truetype'); 
+@font-face {
+    font-family: 'LinoStamp';
+    src: url('Polices/LinoStamp.ttf') format('truetype');
 }
-@font-face { 
-    font-family: 'KingthingsTrypewriter2'; 
-    src: url('Polices/KingthingsTrypewriter2.ttf') format('truetype'); 
+
+@font-face {
+    font-family: 'KingthingsTrypewriter2';
+    src: url('Polices/KingthingsTrypewriter2.ttf') format('truetype');
 }
+
 /* Correction de l'import Bebas (nom de famille cohérent) */
-@font-face { 
-    font-family: 'BebasNeue'; 
-    src: url('Polices/BebasNeue-Regular.ttf') format('truetype'); 
+@font-face {
+    font-family: 'BebasNeue';
+    src: url('Polices/BebasNeue-Regular.ttf') format('truetype');
 }
 
 /* --- STYLES GÉNÉRAUX --- */
@@ -30,13 +34,14 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #1a1a1a; /* Ta couleur de base bien sombre */
+    background-color: #1a1a1a;
+    /* Ta couleur de base bien sombre */
     color: var(--color-white);
     font-family: var(--font-body);
 
     /* On superpose un voile noir très épais (90%) sur l'image */
     background-image: linear-gradient(rgba(26, 26, 26, 0.7), rgba(26, 26, 26, 1)), url('Images/fond.jpg');
-    
+
     background-attachment: fixed;
     background-size: cover;
     background-position: center;
@@ -46,7 +51,7 @@ body {
 
 header {
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.6); 
+    background-color: rgba(0, 0, 0, 0.6);
     border-bottom: 1px solid var(--color-primary);
     padding: 15px 0;
 }
@@ -55,7 +60,7 @@ header {
     max-width: 1100px;
     margin: 0 auto;
     display: flex;
-    justify-content: space-between; 
+    justify-content: space-between;
     align-items: center;
     padding: 0 20px;
 }
@@ -122,11 +127,12 @@ h2 {
     font-family: var(--font-title);
     background-color: var(--color-primary);
     color: #000;
-    mix-blend-mode: screen; /* Effet de découpe sur le fond */
+    mix-blend-mode: screen;
+    /* Effet de découpe sur le fond */
     padding: 15px;
     font-size: 2.8rem;
     margin: 40px 0;
-    text-align: center; 
+    text-align: center;
     width: 100%;
     box-sizing: border-box;
 }
@@ -138,7 +144,8 @@ h2 {
 }
 
 .bio-text {
-    font-family: var(--font-body); /* Bebas Neue pour un look affiche */
+    font-family: var(--font-body);
+    /* Bebas Neue pour un look affiche */
     font-size: 1.4rem;
     letter-spacing: 0.5px;
     line-height: 1.4;
@@ -160,7 +167,7 @@ h2 {
 /* --- CARROUSEL --- */
 .carousel-container {
     position: relative;
-    max-width: 100%; 
+    max-width: 100%;
     margin: 40px auto;
     overflow: hidden;
     border-top: 2px solid var(--color-primary);
@@ -177,9 +184,12 @@ h2 {
 }
 
 .carousel-slide img {
-    width: auto;         /* Laisse l'image prendre sa largeur naturelle */
-    height: 400px;       /* Ajuste la hauteur que tu veux */
-    object-fit: contain; /* "contain" force l'image à être visible EN ENTIER sans être coupée */
+    width: auto;
+    /* Laisse l'image prendre sa largeur naturelle */
+    height: 400px;
+    /* Ajuste la hauteur que tu veux */
+    object-fit: contain;
+    /* "contain" force l'image à être visible EN ENTIER sans être coupée */
     margin-right: 20px;
     display: block;
 }
@@ -189,7 +199,8 @@ h2 {
     transform: scale(1.05);
 }
 
-.prev, .next {
+.prev,
+.next {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -202,10 +213,16 @@ h2 {
     font-family: var(--font-title);
 }
 
-.prev { left: 0; }
-.next { right: 0; }
+.prev {
+    left: 0;
+}
 
-.prev:hover, .next:hover {
+.next {
+    right: 0;
+}
+
+.prev:hover,
+.next:hover {
     background: var(--color-primary);
     color: #000;
 }
@@ -228,7 +245,8 @@ h2 {
 }
 
 .track-info {
-    flex: 0 0 320px; /* Aligne tous les boutons play à la même position */
+    flex: 0 0 320px;
+    /* Aligne tous les boutons play à la même position */
     display: flex;
     align-items: center;
 }
@@ -265,7 +283,9 @@ h2 {
     transition: transform 0.1s;
 }
 
-.play-pause-btn:active { transform: scale(0.9); }
+.play-pause-btn:active {
+    transform: scale(0.9);
+}
 
 .progress-container {
     flex: 1;
@@ -294,11 +314,25 @@ footer {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .track { flex-direction: column; align-items: flex-start; }
-    .track-info { flex: 0 0 auto; margin-bottom: 15px; }
-    .custom-player { width: 100%; }
-    .carousel-slide img { width: 80vw; }
+    .track {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .track-info {
+        flex: 0 0 auto;
+        margin-bottom: 15px;
+    }
+
+    .custom-player {
+        width: 100%;
+    }
+
+    .carousel-slide img {
+        width: 80vw;
+    }
 }
+
 /* --- PAGE GROUPE / BIO --- */
 .bio-content {
     font-family: var(--font-body);
@@ -318,7 +352,8 @@ footer {
 }
 
 .manifesto {
-    font-family: var(--font-subtitle); /* Machine à écrire */
+    font-family: var(--font-subtitle);
+    /* Machine à écrire */
     border-left: 4px solid var(--color-primary);
     padding: 20px;
     margin: 40px 0;
@@ -355,6 +390,7 @@ footer {
 strong {
     color: var(--color-secondary);
 }
+
 /* --- Gestion du Sous-Menu --- */
 
 /* On positionne le parent pour que le sous-menu s'aligne dessous */
@@ -364,11 +400,13 @@ nav ul li.dropdown {
 
 /* Style du sous-menu (caché par défaut) */
 .submenu {
-    display: none; 
+    display: none;
     position: absolute;
-    top: 100%; /* Juste en dessous du lien parent */
+    top: 100%;
+    /* Juste en dessous du lien parent */
     left: 0;
-    background-color: var(--color-bg); /* Ou une couleur plus sombre */
+    background-color: var(--color-bg);
+    /* Ou une couleur plus sombre */
     list-style: none;
     padding: 10px 0;
     min-width: 120px;
@@ -380,40 +418,49 @@ nav ul li.dropdown {
 .submenu {
     display: none;
     position: absolute;
-    top: 80%; /* Un peu plus haut pour coller au texte */
+    top: 80%;
+    /* Un peu plus haut pour coller au texte */
     left: 50%;
-    transform: translateX(-50%); /* Centre le sous-menu sous "Groupe" */
+    transform: translateX(-50%);
+    /* Centre le sous-menu sous "Groupe" */
     list-style: none;
     padding: 0;
     z-index: 100;
-    background: none; /* ON ENLÈVE LE FOND MOCHE */
-    border: none;     /* ON ENLÈVE LA BORDURE */
+    background: none;
+    /* ON ENLÈVE LE FOND MOCHE */
+    border: none;
+    /* ON ENLÈVE LA BORDURE */
 }
 
 .submenu li a {
     display: inline-block;
     padding: 5px 10px;
-    font-family: var(--font-subtitle); /* On utilise la police du groupe */
+    font-family: var(--font-subtitle);
+    /* On utilise la police du groupe */
     font-size: 1rem;
-    color: var(--color-white); /* Couleur rouille/marron */
+    color: var(--color-white);
+    /* Couleur rouille/marron */
     text-transform: lowercase;
     background: none;
     /* On ajoute une petite rotation pour l'effet "tamponné de travers" */
-    transform: rotate(-3deg); 
+    transform: rotate(-3deg);
     border: 1px solid transparent;
 }
 
 /* Au survol d'Albums */
 .submenu li a:hover {
     color: var(--color-secondary);
-    border: 2px solid var(--color-secondary); /* Un cadre qui apparaît au survol seulement */
-    transform: rotate(2deg) scale(1.1); /* Il bouge un peu au survol */
+    border: 2px solid var(--color-secondary);
+    /* Un cadre qui apparaît au survol seulement */
+    transform: rotate(2deg) scale(1.1);
+    /* Il bouge un peu au survol */
 }
 
 /* Affichage au survol de Groupe */
 nav ul li.dropdown:hover .submenu {
     display: block;
 }
+
 /* --- PAGE ALBUMS --- */
 .albums-container {
     max-width: 1000px;
@@ -451,19 +498,22 @@ nav ul li.dropdown:hover .submenu {
 
 .album-info h3 {
     font-family: var(--font-title);
-    font-size: 3rem; /* On l'agrandit encore un peu */
-    color: #f4f4f4;  /* Un blanc cassé très lisible */
+    font-size: 3rem;
+    /* On l'agrandit encore un peu */
+    color: #f4f4f4;
+    /* Un blanc cassé très lisible */
     text-transform: uppercase;
     margin-bottom: 5px;
     letter-spacing: 2px;
     /* Petit effet d'ombre pour décoller le texte du fond */
-    text-shadow: 3px 3px 0px var(--color-primary); 
+    text-shadow: 3px 3px 0px var(--color-primary);
 }
 
 .album-date {
     font-family: var(--font-subtitle);
     font-size: 1.1rem;
-    color: var(--color-secondary); /* Ici on garde ta couleur pour le rappel */
+    color: var(--color-secondary);
+    /* Ici on garde ta couleur pour le rappel */
     font-weight: bold;
     margin-bottom: 25px;
     display: block;
@@ -474,22 +524,28 @@ nav ul li.dropdown:hover .submenu {
     font-family: var(--font-body);
     font-size: 1.1rem;
     line-height: 1.7;
-    color: #cccccc; /* Gris clair pour ne pas fatiguer l'oeil */
-    max-width: 500px; /* On évite les lignes trop longues */
+    color: #cccccc;
+    /* Gris clair pour ne pas fatiguer l'oeil */
+    max-width: 500px;
+    /* On évite les lignes trop longues */
 }
 
 /* Responsive pour mobile */
 @media (max-width: 768px) {
-    .album-card, .album-card.reverse {
+
+    .album-card,
+    .album-card.reverse {
         flex-direction: column;
         text-align: center;
     }
+
     .album-visual img {
         width: 100%;
         max-width: 300px;
         height: auto;
     }
 }
+
 /* --- GALERIE VIDÉO --- */
 .video-gallery {
     max-width: 1200px;
@@ -522,7 +578,8 @@ nav ul li.dropdown:hover .submenu {
 
 .video-wrapper {
     position: relative;
-    padding-bottom: 56.25%; /* Ratio 16:9 */
+    padding-bottom: 56.25%;
+    /* Ratio 16:9 */
     height: 0;
     overflow: hidden;
     border: 3px solid var(--color-primary);

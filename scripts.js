@@ -57,7 +57,7 @@ function initInfiniteCarousel() {
     const items = document.querySelectorAll('.carousel-slide img');
     const nextBtn = document.querySelector('.next');
     const prevBtn = document.querySelector('.prev');
-    
+
     if (!track || items.length === 0) return;
 
     const gap = 20;
@@ -72,7 +72,7 @@ function initInfiniteCarousel() {
 
     function move() {
         const itemWidth = items[0].clientWidth + gap;
-        if (itemWidth <= gap) return; 
+        if (itemWidth <= gap) return;
 
         index++;
         track.style.transition = "transform 0.5s ease-in-out";
