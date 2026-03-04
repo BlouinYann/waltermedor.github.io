@@ -1,20 +1,20 @@
 /**
  * scripts.js - Walter Medor
- * Version UNIFIÉE : Utilise BASE_PATH pour corriger les erreurs 404 sur GitHub
+ * Version Auto-Détection de Racine
  */
 
-// 1. DÉFINITION DE LA RACINE DU PROJET
-const isGitHub = window.location.hostname.includes('github.io');
-// On utilise le nom exact du dépôt pour GitHub, rien pour le local
-const BASE_PATH = isGitHub ? '/waltermedor.github.io' : '';
+// 1. DÉTECTION DYNAMIQUE DU CHEMIN RACINE
+// On cherche si "/waltermedor.github.io/" est présent dans l'URL
+const projectPath = "/waltermedor.github.io/";
+const BASE_PATH = window.location.pathname.includes(projectPath) ? projectPath : "/";
 
 // 2. FONCTION DE CHARGEMENT GÉNÉRIQUE
 function loadComponent(id, fileName) {
     const element = document.getElementById(id);
     if (!element) return Promise.resolve();
 
-    // On combine BASE_PATH (racine du dépôt) avec le nom du fichier
-    const url = `${BASE_PATH}/${fileName}`;
+    // On construit l'URL en s'assurant qu'il n'y a pas de double slash
+    const url = (BASE_PATH + fileName).replace(/\/+/g, '/');
 
     return fetch(url)
         .then(response => {
@@ -30,22 +30,19 @@ function loadComponent(id, fileName) {
 
 // 3. INITIALISATION
 document.addEventListener("DOMContentLoaded", () => {
-    
-    // Favicon dynamique utilisant la base du projet
-    const favicon = document.createElement('link');
-    favicon.rel = 'icon';
-    favicon.type = 'image/png';
-    favicon.href = `${BASE_PATH}/Images/icon.png`; 
-    document.head.appendChild(favicon);
-
-    // Chargement des composants SANS calcul de "prefix" variable
+    // On charge les composants en utilisant le BASE_PATH détecté
     loadComponent("main-header", "header.html");
     loadComponent("main-footer", "footer.html");
 
-    // Initialisation des lecteurs audio
-    initAudioPlayers();
-});
+    // Mise à jour dynamique du favicon
+    const favicon = document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.href = (BASE_PATH + "Images/icon.png").replace(/\/+/g, '/');
+    document.head.appendChild(favicon);
 
+    initAudioPlayers();
+    initInfiniteCarousel();
+});
 // 4. INITIALISATION DU CARROUSEL
 window.onload = () => {
     initInfiniteCarousel();
