@@ -1,13 +1,19 @@
-// 1. AUTOMATISATION DU CHEMIN (BASE PATH)
+/**
+ * scripts.js - Walter Medor
+ * Version UNIFIÉE : Utilise BASE_PATH pour tous les chargements
+ */
+
+// 1. DÉTERMINATION DE LA RACINE DU SITE
 const isGitHub = window.location.hostname.includes('github.io');
-// On utilise le nom exact du dépôt GitHub
+// Remplacez 'waltermedor.github.io' par le nom exact de votre dépôt si nécessaire
 const BASE_PATH = isGitHub ? '/waltermedor.github.io' : '';
 
 // 2. FONCTION DE CHARGEMENT GÉNÉRIQUE
 function loadComponent(id, fileName) {
     const element = document.getElementById(id);
-    if (!element) return Promise.resolve(); // Évite de bloquer si l'ID n'existe pas
+    if (!element) return Promise.resolve();
 
+    // On part TOUJOURS de la racine définie par BASE_PATH
     const url = `${BASE_PATH}/${fileName}`;
 
     return fetch(url)
@@ -23,28 +29,20 @@ function loadComponent(id, fileName) {
 }
 
 // 3. INITIALISATION AU CHARGEMENT DU DOM
-const favicon = document.createElement('link');
-favicon.rel = 'icon';
-favicon.type = 'image/png';
-favicon.href = '../Images/icon.png'; 
-document.head.appendChild(favicon);
-
 document.addEventListener("DOMContentLoaded", () => {
     
-    // 2. Calcul dynamique des chemins pour le header/footer
-    const path = window.location.pathname;
-    const depth = path.split('/').filter(p => p.length > 0 && !p.includes('.html')).length;
-    
-    let prefix = "";
-    if (depth > 0) {
-        prefix = "../".repeat(depth);
-    }
+    // Favicon dynamique
+    const favicon = document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.type = 'image/png';
+    favicon.href = `${BASE_PATH}/Images/icon.png`; 
+    document.head.appendChild(favicon);
 
-    // 3. Chargement des composants HTML
-    loadComponent("main-header", `${prefix}header.html`);
-    loadComponent("main-footer", `${prefix}footer.html`);
+    // Chargement des composants HTML via le chemin absolu du projet
+    loadComponent("main-header", `header.html`);
+    loadComponent("main-footer", `footer.html`);
 
-    // 4. Initialisation des lecteurs audio
+    // Initialisation des lecteurs audio
     initAudioPlayers();
 });
 
@@ -52,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
 window.onload = () => {
     initInfiniteCarousel();
 };
+
 
 // 5. GESTION DU CARROUSEL
 function initInfiniteCarousel() {
