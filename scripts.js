@@ -150,3 +150,42 @@ function initAudioPlayers() {
         }
     });
 }
+
+function loadComponent(id, fileName) {
+    const element = document.getElementById(id);
+    if (!element) return Promise.resolve();
+
+    const url = `${BASE_PATH}/${fileName}`;
+
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(`404: ${url}`);
+            return response.text();
+        })
+        .then(data => {
+            element.innerHTML = data;
+            
+            // --- CORRECTION DYNAMIQUE DES LIENS ---
+            if (isGitHub) {
+                const links = element.querySelectorAll('a');
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    // Si le lien est relatif et ne commence pas par http ou /
+                    if (href && !href.startsWith('http') && !href.startsWith('/')) {
+                        // On force le lien à partir du BASE_PATH
+                        link.href = `${BASE_PATH}/${href.replace(/\.\.\//g, '')}`;
+                    }
+                });
+                
+                const images = element.querySelectorAll('img');
+                images.forEach(img => {
+                    const src = img.getAttribute('src');
+                    if (src && src.startsWith('/')) {
+                        img.src = `${BASE_PATH}${src}`;
+                    }
+                });
+            }
+            console.log(`✅ ${id} corrigé pour GitHub`);
+        })
+        .catch(error => console.error(`❌ Erreur :`, error));
+}
