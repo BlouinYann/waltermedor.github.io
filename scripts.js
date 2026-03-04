@@ -1,83 +1,79 @@
 /**
  * scripts.js - Walter Medor
- * Version Auto-Détection de Racine
+ * Version Finale : Fix 404 & Menu Mobile Universel
  */
 
-// 1. DÉTECTION DYNAMIQUE DU CHEMIN RACINE
-// On cherche si "/waltermedor.github.io/" est présent dans l'URL
-const projectPath = "/waltermedor.github.io/";
-const BASE_PATH = window.location.pathname.includes(projectPath) ? projectPath : "/";
+const repoName = 'waltermedor.github.io';
+const isGitHub = window.location.hostname.includes('github.io');
+const isLocalRepoFolder = window.location.pathname.includes(repoName);
 
-// 2. FONCTION DE CHARGEMENT GÉNÉRIQUE
+// Détermine la base : /waltermedor.github.io/ ou /
+const BASE_PATH = (isGitHub || isLocalRepoFolder) ? `/${repoName}/` : '/';
+
 function loadComponent(id, fileName) {
     const element = document.getElementById(id);
     if (!element) return Promise.resolve();
 
-    // On construit l'URL en s'assurant qu'il n'y a pas de double slash
     const url = (BASE_PATH + fileName).replace(/\/+/g, '/');
 
     return fetch(url)
         .then(response => {
-            if (!response.ok) throw new Error(`404: ${url}`);
+            if (!response.ok) throw new Error(`Erreur ${response.status} sur ${url}`);
             return response.text();
         })
         .then(data => {
             element.innerHTML = data;
-            console.log(`✅ ${id} chargé depuis : ${url}`);
+
+            // Une fois le header chargé, on active le bouton burger
+            if (id === "main-header") {
+                const menuToggle = element.querySelector('.menu-toggle');
+                const navMenu = element.querySelector('.nav-menu');
+
+                if (menuToggle && navMenu) {
+                    menuToggle.onclick = (e) => {
+                        e.preventDefault();
+                        navMenu.classList.toggle('active');
+                        menuToggle.classList.toggle('is-active');
+                    };
+
+                    // Fermeture au clic sur un lien
+                    navMenu.querySelectorAll('a').forEach(link => {
+                        link.onclick = () => {
+                            navMenu.classList.remove('active');
+                            menuToggle.classList.remove('is-active');
+                        };
+                    });
+                }
+            }
         })
-        .catch(error => console.error(`❌ Erreur :`, error));
+        .catch(error => console.error(`❌ Erreur chargement :`, error));
 }
 
-// 3. INITIALISATION
 document.addEventListener("DOMContentLoaded", () => {
-    // On charge les composants en utilisant le BASE_PATH détecté
+    // On charge les composants
     loadComponent("main-header", "header.html");
     loadComponent("main-footer", "footer.html");
-
-    // Mise à jour dynamique du favicon
-    const favicon = document.createElement('link');
-    favicon.rel = 'icon';
-    favicon.href = (BASE_PATH + "Images/icon.png").replace(/\/+/g, '/');
-    document.head.appendChild(favicon);
-
+    
+    // ON LANCE L'AUDIO ICI
     initAudioPlayers();
-    initInfiniteCarousel();
 });
-// 4. INITIALISATION DU CARROUSEL
-window.onload = () => {
-    initInfiniteCarousel();
-};
 
-// --- Gardez vos fonctions initInfiniteCarousel() et initAudioPlayers() ici ---
+// --- Garde tes fonctions initInfiniteCarousel et initAudioPlayers en dessous ---
+window.onload = () => { if (typeof initInfiniteCarousel === "function") initInfiniteCarousel(); };
 
-
-// 5. GESTION DU CARROUSEL
 function initInfiniteCarousel() {
     const track = document.querySelector('.carousel-slide');
     const items = document.querySelectorAll('.carousel-slide img');
-    const nextBtn = document.querySelector('.next');
-    const prevBtn = document.querySelector('.prev');
-
     if (!track || items.length === 0) return;
-
-    const gap = 20;
-    let index = 0;
-
+    const gap = 20; let index = 0;
     if (track.children.length === items.length) {
-        items.forEach(item => {
-            const clone = item.cloneNode(true);
-            track.appendChild(clone);
-        });
+        items.forEach(item => track.appendChild(item.cloneNode(true)));
     }
-
     function move() {
         const itemWidth = items[0].clientWidth + gap;
-        if (itemWidth <= gap) return;
-
         index++;
         track.style.transition = "transform 0.5s ease-in-out";
         track.style.transform = `translateX(${-index * itemWidth}px)`;
-
         if (index >= items.length) {
             setTimeout(() => {
                 track.style.transition = "none";
@@ -86,64 +82,61 @@ function initInfiniteCarousel() {
             }, 500);
         }
     }
-
-    if (nextBtn) nextBtn.addEventListener('click', move);
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            const itemWidth = items[0].clientWidth + gap;
-            if (index <= 0) {
-                index = items.length;
-                track.style.transition = "none";
-                track.style.transform = `translateX(${-index * itemWidth}px)`;
-            }
-            setTimeout(() => {
-                index--;
-                track.style.transition = "transform 0.5s ease-in-out";
-                track.style.transform = `translateX(${-index * itemWidth}px)`;
-            }, 10);
-        });
-    }
-
     setInterval(move, 4000);
 }
 
-// 6. GESTION DE L'AUDIO
 function initAudioPlayers() {
-    const players = document.querySelectorAll('.custom-player');
+    // 1. On récupère tous les boutons de lecture
+    const playButtons = document.querySelectorAll('.play-pause-btn');
+    
+    console.log("Initialisation des lecteurs :", playButtons.length, "boutons trouvés.");
 
-    players.forEach(player => {
-        const audio = player.querySelector('audio');
-        const btn = player.querySelector('.play-pause-btn');
-        const bar = player.querySelector('.progress-bar');
-        const container = player.querySelector('.progress-container');
+    playButtons.forEach(btn => {
+        // On force le clic
+        btn.onclick = function(e) {
+            e.preventDefault();
+            const audioId = this.getAttribute('data-audio');
+            const audio = document.getElementById(audioId);
+            const bar = document.getElementById('bar-' + audioId);
 
-        if (!audio || !btn) return;
+            if (!audio) {
+                console.error("Audio introuvable pour l'ID :", audioId);
+                return;
+            }
 
-        btn.addEventListener('click', () => {
             if (audio.paused) {
+                // Arrêter toutes les autres pistes avant de jouer celle-ci
                 document.querySelectorAll('audio').forEach(a => {
                     a.pause();
-                    const otherBtn = a.parentElement.querySelector('.play-pause-btn');
-                    if (otherBtn) otherBtn.innerText = "▶";
+                    a.currentTime = 0; // Optionnel : reset la piste
                 });
+                document.querySelectorAll('.play-pause-btn').forEach(b => b.innerText = "▶");
+
                 audio.play();
-                btn.innerText = "II";
+                this.innerText = "II"; // Symbole Pause
             } else {
                 audio.pause();
-                btn.innerText = "▶";
+                this.innerText = "▶"; // Symbole Play
             }
-        });
 
-        audio.addEventListener('timeupdate', () => {
-            if (audio.duration && bar) {
-                bar.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
-            }
-        });
-
-        if (container) {
-            container.addEventListener('click', (e) => {
-                audio.currentTime = (e.offsetX / container.clientWidth) * audio.duration;
-            });
-        }
+            // Gestion de la barre de progression
+            audio.ontimeupdate = () => {
+                if (bar && audio.duration) {
+                    const progress = (audio.currentTime / audio.duration) * 100;
+                    bar.style.width = progress + "%";
+                }
+            };
+        };
     });
 }
+menuToggle.onclick = (e) => {
+    e.preventDefault();
+    navMenu.classList.toggle('active');
+    
+    // Bloque le défilement de la page quand le menu est ouvert
+    if (navMenu.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = '';
+    }
+};

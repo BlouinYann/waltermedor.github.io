@@ -51,9 +51,11 @@ body {
 
 header {
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.8); /* Un peu plus opaque pour la lisibilité */
     border-bottom: 1px solid var(--color-primary);
-    padding: 15px 0;
+    padding: 10px 0;
+    position: relative;
+    z-index: 1001; /* Doit être au-dessus de l'overlay (1000) */
 }
 
 .header-container {
@@ -63,6 +65,7 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
+    position: relative; 
 }
 
 .brand {
@@ -262,6 +265,8 @@ h2 {
     font-family: var(--font-subtitle);
     font-size: 1.1rem;
     text-transform: lowercase;
+    white-space: normal; /* Autorise le texte à aller à la ligne si trop long */
+    word-wrap: break-word;
 }
 
 /* --- LECTEUR AUDIO CUSTOM --- */
@@ -614,3 +619,118 @@ nav ul li.dropdown:hover .submenu {
         grid-template-columns: 1fr;
     }
 }
+/* --- GESTION DU MENU MOBILE --- */
+
+/* 1. Sur ordinateur (on cache le bouton burger, on montre le menu) */
+@media (min-width: 769px) {
+    .menu-toggle {
+        display: none;
+    }
+    .nav-menu {
+        display: flex !important; /* Toujours visible sur PC */
+    }
+}
+
+/* --- CONFIGURATION MOBILE (768px et moins) --- */
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none; 
+        flex-direction: column;
+        position: fixed; 
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(26, 26, 26, 0.98); /* Utilise ta variable bg-color */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000; /* Juste en dessous du bouton burger */
+    }
+
+    /* Affiche tout le menu (Menu + Submenu) comme demandé */
+    .nav-menu.active {
+        display: flex;
+    }
+
+    .nav-menu ul li .submenu {
+        display: block !important; /* On force l'affichage du sous-menu sur mobile */
+        position: static;
+        transform: none;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    /* Le bouton burger doit rester cliquable au-dessus du menu */
+    .menu-toggle {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        z-index: 1100; /* Le plus haut de tous */
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 10px;
+    }
+
+
+    .menu-toggle span {
+        display: block;
+        width: 25px;
+        height: 3px;
+        background-color: white;
+        transition: 0.3s;
+    }
+}
+@media (max-width: 768px) {
+
+    /* ICI on dit à la barre de s'effacer uniquement sur téléphone */
+    .progress-container {
+        display: none !important;
+    }
+
+    /* On s'assure que le titre et le bouton restent bien alignés */
+    .track {
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 15px 10px !important;
+    }
+
+    .track-info {
+        flex: 1 !important; /* Le texte prend la place à gauche */
+        margin-bottom: 0 !important;
+    }
+}
+/* --- CONFIGURATION ORDINATEUR (Plus de 768px) --- */
+@media (min-width: 769px) {
+    .menu-toggle {
+        display: none; /* Cache le burger sur PC */
+    }
+    .nav-menu {
+        display: flex !important; /* Toujours visible sur PC */
+        position: static;
+        height: auto;
+        background: none;
+    }
+    .nav-menu ul {
+        flex-direction: row;
+        gap: 20px;
+    }
+}
+@media (max-width: 768px) {
+    /* Cache la barre de progression */
+    .progress-container {
+        display: none !important;
+    }
+
+    /* Aligne titre et bouton */
+    .track {
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+
+    .track-info {
+        flex: 1 !important;
+    }
+} /* <--- BIEN VÉRIFIER CETTE ACCOLADE DE FIN */
