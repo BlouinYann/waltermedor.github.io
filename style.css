@@ -396,69 +396,57 @@ strong {
     color: var(--color-secondary);
 }
 
-/* --- Gestion du Sous-Menu --- */
+/* --- GESTION DU SOUS-MENU --- */
 
-/* On positionne le parent pour que le sous-menu s'aligne dessous */
+/* Parent (Lien "Groupe") */
 nav ul li.dropdown {
     position: relative;
+    padding-bottom: 10px; /* Zone tampon pour ne pas perdre le focus souris */
 }
 
-/* Style du sous-menu (caché par défaut) */
+/* Le conteneur du sous-menu */
 .submenu {
     display: none;
     position: absolute;
-    top: 100%;
-    /* Juste en dessous du lien parent */
-    left: 0;
-    background-color: var(--color-bg);
-    /* Ou une couleur plus sombre */
-    list-style: none;
-    padding: 10px 0;
-    min-width: 120px;
-    border: 1px solid var(--color-secondary);
-    z-index: 100;
-}
-
-/* --- Style du Sous-Menu "Albums" Minimaliste --- */
-.submenu {
-    display: none;
-    position: absolute;
-    top: 80%;
-    /* Un peu plus haut pour coller au texte */
+    top: 100%; /* Se place juste sous le padding du parent */
     left: 50%;
     transform: translateX(-50%);
-    /* Centre le sous-menu sous "Groupe" */
     list-style: none;
-    padding: 0;
+    padding: 15px 0; /* Espace interne */
     z-index: 100;
-    background: none;
-    /* ON ENLÈVE LE FOND MOCHE */
-    border: none;
-    /* ON ENLÈVE LA BORDURE */
+    background: rgba(26, 26, 26, 0.95); /* Fond sombre pour détacher du contenu */
+    border: 1px solid var(--color-primary);
+    min-width: 150px;
+    text-align: center;
+    box-shadow: 0px 8px 15px rgba(0,0,0,0.5);
+}
+
+/* Affichage au survol */
+nav ul li.dropdown:hover .submenu {
+    display: block;
+}
+
+/* Liens à l'intérieur du sous-menu */
+.submenu li {
+    margin: 10px 0;
 }
 
 .submenu li a {
-    display: inline-block;
-    padding: 5px 10px;
+    display: block;
+    padding: 8px 15px;
     font-family: var(--font-subtitle);
-    /* On utilise la police du groupe */
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--color-white);
-    /* Couleur rouille/marron */
     text-transform: lowercase;
-    background: none;
-    /* On ajoute une petite rotation pour l'effet "tamponné de travers" */
-    transform: rotate(-3deg);
-    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    border: none; /* On reset la bordure par défaut */
 }
 
-/* Au survol d'Albums */
+/* Effet au survol des liens du sous-menu */
 .submenu li a:hover {
     color: var(--color-secondary);
-    border: 2px solid var(--color-secondary);
-    /* Un cadre qui apparaît au survol seulement */
-    transform: rotate(2deg) scale(1.1);
-    /* Il bouge un peu au survol */
+    background: rgba(99, 81, 67, 0.2); /* Léger rappel de ta couleur primaire */
+    transform: scale(1.05) rotate(1deg);
 }
 
 /* Affichage au survol de Groupe */
@@ -614,81 +602,76 @@ nav ul li.dropdown:hover .submenu {
 }
 
 /* Mobile */
-@media (max-width: 600px) {
-    .video-grid {
-        grid-template-columns: 1fr;
-    }
-}
-/* --- GESTION DU MENU MOBILE --- */
-
-/* 1. Sur ordinateur (on cache le bouton burger, on montre le menu) */
+/* --- CONFIGURATION ORDINATEUR --- */
 @media (min-width: 769px) {
     .menu-toggle {
-        display: none;
+        display: none; /* Cache le burger */
     }
+
     .nav-menu {
-        display: flex !important; /* Toujours visible sur PC */
+        display: flex !important; 
+        position: static;
+        height: auto;
+        background: none;
+    }
+
+    .nav-menu ul {
+        display: flex;
+        flex-direction: row;
+        gap: 25px;
+    }
+
+    /* Le sous-menu s'affiche au survol sur PC */
+    nav ul li.dropdown:hover .submenu {
+        display: block;
     }
 }
-
-/* --- CONFIGURATION MOBILE (768px et moins) --- */
+/* --- CONFIGURATION MOBILE --- */
 @media (max-width: 768px) {
+    /* Le bouton burger est rendu visible par la règle globale en bas du fichier */
+    
     .nav-menu {
-        display: none; 
-        flex-direction: column;
-        position: fixed; 
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background-color: rgba(26, 26, 26, 0.98); /* Utilise ta variable bg-color */
-        justify-content: center;
-        align-items: center;
-        z-index: 1000; /* Juste en dessous du bouton burger */
+        display: none; /* Caché par défaut, activé par la classe .active */
     }
 
-    /* Affiche tout le menu (Menu + Submenu) comme demandé */
     .nav-menu.active {
-        display: flex;
+        display: flex !important;
     }
 
+
+    .nav-menu ul {
+        flex-direction: column;
+        gap: 25px;
+        text-align: center;
+    }
+
+    .nav-menu ul li a {
+        font-size: 1.5rem;
+    }
+
+    /* 2. Sous-menu (Albums) intégré proprement */
     .nav-menu ul li .submenu {
-        display: block !important; /* On force l'affichage du sous-menu sur mobile */
+        display: block !important; /* Toujours visible si le menu est ouvert */
         position: static;
         transform: none;
-        text-align: center;
         margin-top: 10px;
-    }
-
-    /* Le bouton burger doit rester cliquable au-dessus du menu */
-    .menu-toggle {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        z-index: 1100; /* Le plus haut de tous */
-        cursor: pointer;
-        background: none;
         border: none;
-        padding: 10px;
+        background: none;
     }
 
-
-    .menu-toggle span {
-        display: block;
-        width: 25px;
-        height: 3px;
-        background-color: white;
-        transition: 0.3s;
+    .nav-menu ul li .submenu li a {
+        font-size: 1.1rem;
+        color: var(--color-secondary);
+        transform: none; /* On enlève la rotation pour la lisibilité mobile */
     }
-}
-@media (max-width: 768px) {
 
-    /* ICI on dit à la barre de s'effacer uniquement sur téléphone */
+    /* 3. Bouton Burger : styles définis globalement hors media query */
+
+    /* 4. Lecteur Audio Mobile */
     .progress-container {
-        display: none !important;
+        display: none !important; /* Cache la barre de progression */
     }
 
-    /* On s'assure que le titre et le bouton restent bien alignés */
     .track {
         flex-direction: row !important;
         justify-content: space-between !important;
@@ -697,40 +680,42 @@ nav ul li.dropdown:hover .submenu {
     }
 
     .track-info {
-        flex: 1 !important; /* Le texte prend la place à gauche */
+        flex: 1 !important;
         margin-bottom: 0 !important;
     }
-}
-/* --- CONFIGURATION ORDINATEUR (Plus de 768px) --- */
-@media (min-width: 769px) {
-    .menu-toggle {
-        display: none; /* Cache le burger sur PC */
+
+    /* 5. Galerie Vidéo & Grille */
+    .video-grid {
+        grid-template-columns: 1fr;
     }
-    .nav-menu {
-        display: flex !important; /* Toujours visible sur PC */
-        position: static;
+    
+    .carousel-slide img {
+        width: 80vw;
         height: auto;
-        background: none;
-    }
-    .nav-menu ul {
-        flex-direction: row;
-        gap: 20px;
     }
 }
+/* --- BOUTON BURGER : définition complète hors media query --- */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 1100;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 10px;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    transition: 0.3s;
+}
+
 @media (max-width: 768px) {
-    /* Cache la barre de progression */
-    .progress-container {
-        display: none !important;
+    .menu-toggle {
+        display: flex !important;
     }
-
-    /* Aligne titre et bouton */
-    .track {
-        flex-direction: row !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-    }
-
-    .track-info {
-        flex: 1 !important;
-    }
-} /* <--- BIEN VÉRIFIER CETTE ACCOLADE DE FIN */
+}

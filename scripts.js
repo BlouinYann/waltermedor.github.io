@@ -1,142 +1,151 @@
 /**
  * scripts.js - Walter Medor
- * Version Finale : Fix 404 & Menu Mobile Universel
+ * Version Finale : Gestion universelle des chemins racine/sous-dossiers
  */
 
-const repoName = 'waltermedor.github.io';
-const isGitHub = window.location.hostname.includes('github.io');
-const isLocalRepoFolder = window.location.pathname.includes(repoName);
+// 1. Détection dynamique du chemin racine
+// Calcule le bon nombre de "../" selon la profondeur réelle de l'URL
+const getBasePath = () => {
+    const segments = window.location.pathname
+        .split('/')
+        .filter(s => s !== '' && !s.includes('.html'));
+    if (segments.length === 0) return './';
+    return '../'.repeat(segments.length);
+};
 
-// Détermine la base : /waltermedor.github.io/ ou /
-const BASE_PATH = (isGitHub || isLocalRepoFolder) ? `/${repoName}/` : '/';
-
-function loadComponent(id, fileName) {
+/**
+ * Charge un composant HTML (Header, Footer)
+ */
+async function loadComponent(id, fileName) {
     const element = document.getElementById(id);
-    if (!element) return Promise.resolve();
+    if (!element) return;
 
-    const url = (BASE_PATH + fileName).replace(/\/+/g, '/');
+    const url = getBasePath() + fileName;
 
-    return fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error(`Erreur ${response.status} sur ${url}`);
-            return response.text();
-        })
-        .then(data => {
-            element.innerHTML = data;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Fichier non trouvé à l'adresse : ${url}`);
 
-            // Une fois le header chargé, on active le bouton burger
-            if (id === "main-header") {
-                const menuToggle = element.querySelector('.menu-toggle');
-                const navMenu = element.querySelector('.nav-menu');
+        const data = await response.text();
+        element.innerHTML = data;
 
-                if (menuToggle && navMenu) {
-                    menuToggle.onclick = (e) => {
-                        e.preventDefault();
-                        navMenu.classList.toggle('active');
-                        menuToggle.classList.toggle('is-active');
-                    };
-
-                    // Fermeture au clic sur un lien
-                    navMenu.querySelectorAll('a').forEach(link => {
-                        link.onclick = () => {
-                            navMenu.classList.remove('active');
-                            menuToggle.classList.remove('is-active');
-                        };
-                    });
-                }
-            }
-        })
-        .catch(error => console.error(`❌ Erreur chargement :`, error));
+        if (id === "main-header") {
+            initMobileMenu(element);
+        }
+    } catch (error) {
+        console.error(`❌ Erreur chargement ${fileName} :`, error);
+    }
 }
 
+/**
+ * Initialisation du Menu Mobile
+ * Appelée UNIQUEMENT après l'injection du HTML du header
+ */
+function initMobileMenu(headerElement) {
+    const menuToggle = headerElement.querySelector('.menu-toggle');
+    const navMenu = headerElement.querySelector('.nav-menu');
+
+    if (!menuToggle || !navMenu) return;
+
+    // Ouverture/fermeture du menu burger
+    menuToggle.onclick = (e) => {
+        e.preventDefault();
+        const isActive = navMenu.classList.toggle('active');
+        menuToggle.classList.toggle('is-active');
+        document.body.style.overflow = isActive ? 'hidden' : '';
+    };
+
+    // Clic sur "Groupe" sur mobile : ouvre/ferme le sous-menu
+    navMenu.querySelectorAll('.dropdown > a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                link.closest('.dropdown').classList.toggle('submenu-open');
+            }
+        });
+    });
+
+    // Fermeture du menu au clic sur un lien final
+    navMenu.querySelectorAll('a:not(.dropdown > a)').forEach(link => {
+        link.onclick = () => {
+            navMenu.classList.remove('active');
+            menuToggle.classList.remove('is-active');
+            document.body.style.overflow = '';
+        };
+    });
+}
+
+/**
+ * Lancement au chargement du DOM
+ */
 document.addEventListener("DOMContentLoaded", () => {
-    // On charge les composants
-    loadComponent("main-header", "header.html");
-    loadComponent("main-footer", "footer.html");
-    
-    // ON LANCE L'AUDIO ICI
-    initAudioPlayers();
+    Promise.all([
+        loadComponent("main-header", "header.html"),
+        loadComponent("main-footer", "footer.html")
+    ]).then(() => {
+        if (typeof initAudioPlayers === 'function') initAudioPlayers();
+        if (typeof initInfiniteCarousel === 'function') initInfiniteCarousel();
+    });
 });
 
-// --- Garde tes fonctions initInfiniteCarousel et initAudioPlayers en dessous ---
-window.onload = () => { if (typeof initInfiniteCarousel === "function") initInfiniteCarousel(); };
-
-function initInfiniteCarousel() {
-    const track = document.querySelector('.carousel-slide');
-    const items = document.querySelectorAll('.carousel-slide img');
-    if (!track || items.length === 0) return;
-    const gap = 20; let index = 0;
-    if (track.children.length === items.length) {
-        items.forEach(item => track.appendChild(item.cloneNode(true)));
-    }
-    function move() {
-        const itemWidth = items[0].clientWidth + gap;
-        index++;
-        track.style.transition = "transform 0.5s ease-in-out";
-        track.style.transform = `translateX(${-index * itemWidth}px)`;
-        if (index >= items.length) {
-            setTimeout(() => {
-                track.style.transition = "none";
-                index = 0;
-                track.style.transform = `translateX(0)`;
-            }, 500);
-        }
-    }
-    setInterval(move, 4000);
-}
+/* --- AUDIO --- */
 
 function initAudioPlayers() {
-    // 1. On récupère tous les boutons de lecture
     const playButtons = document.querySelectorAll('.play-pause-btn');
-    
-    console.log("Initialisation des lecteurs :", playButtons.length, "boutons trouvés.");
-
     playButtons.forEach(btn => {
-        // On force le clic
         btn.onclick = function(e) {
             e.preventDefault();
             const audioId = this.getAttribute('data-audio');
             const audio = document.getElementById(audioId);
             const bar = document.getElementById('bar-' + audioId);
-
-            if (!audio) {
-                console.error("Audio introuvable pour l'ID :", audioId);
-                return;
-            }
-
+            if (!audio) return;
             if (audio.paused) {
-                // Arrêter toutes les autres pistes avant de jouer celle-ci
-                document.querySelectorAll('audio').forEach(a => {
-                    a.pause();
-                    a.currentTime = 0; // Optionnel : reset la piste
-                });
+                document.querySelectorAll('audio').forEach(t => t.pause());
                 document.querySelectorAll('.play-pause-btn').forEach(b => b.innerText = "▶");
-
                 audio.play();
-                this.innerText = "II"; // Symbole Pause
+                this.innerText = "II";
             } else {
                 audio.pause();
-                this.innerText = "▶"; // Symbole Play
+                this.innerText = "▶";
             }
-
-            // Gestion de la barre de progression
             audio.ontimeupdate = () => {
                 if (bar && audio.duration) {
-                    const progress = (audio.currentTime / audio.duration) * 100;
-                    bar.style.width = progress + "%";
+                    bar.style.width = (audio.currentTime / audio.duration) * 100 + "%";
                 }
             };
         };
     });
 }
-menuToggle.onclick = (e) => {
-    e.preventDefault();
-    navMenu.classList.toggle('active');
-    
-    // Bloque le défilement de la page quand le menu est ouvert
-    if (navMenu.classList.contains('active')) {
-        document.body.style.overflow = 'hidden';
-    } else {
-        document.body.style.overflow = '';
+
+/* --- CARROUSEL --- */
+
+function initInfiniteCarousel() {
+    const track = document.querySelector('.carousel-slide');
+    const items = document.querySelectorAll('.carousel-slide img');
+    if (!track || items.length === 0) return;
+    const gap = 20;
+    let index = 0;
+    if (track.children.length === items.length) {
+        items.forEach(item => track.appendChild(item.cloneNode(true)));
     }
-};
+    const move = () => {
+        const itemWidth = items[0].getBoundingClientRect().width + gap;
+        track.style.transition = "transform 0.5s ease-in-out";
+        track.style.transform = `translateX(${-index * itemWidth}px)`;
+    };
+    const nextBtn = document.querySelector('.next');
+    if (nextBtn) {
+        nextBtn.onclick = (e) => {
+            e.preventDefault();
+            index++;
+            move();
+            if (index >= items.length) {
+                setTimeout(() => {
+                    track.style.transition = "none";
+                    index = 0;
+                    track.style.transform = `translateX(0)`;
+                }, 500);
+            }
+        };
+    }
+}
