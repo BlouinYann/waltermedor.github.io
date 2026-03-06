@@ -3,7 +3,7 @@
  * Version Finale : Gestion universelle des chemins racine/sous-dossiers
  */
 
-// 1. Détection dynamique du chemin racine
+// Détection dynamique du chemin racine
 // Calcule le bon nombre de "../" selon la profondeur réelle de l'URL
 const getBasePath = () => {
     const segments = window.location.pathname
@@ -58,7 +58,7 @@ function initMobileMenu(headerElement) {
     // Clic sur "Groupe" sur mobile : ouvre/ferme le sous-menu
     navMenu.querySelectorAll('.dropdown > a').forEach(link => {
         link.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= 985) {
                 e.preventDefault();
                 link.closest('.dropdown').classList.toggle('submenu-open');
             }
@@ -79,6 +79,13 @@ function initMobileMenu(headerElement) {
  * Lancement au chargement du DOM
  */
 document.addEventListener("DOMContentLoaded", () => {
+    // Injection dynamique du favicon
+    const favicon = document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.href = '/Images/icon.png';
+    favicon.type = 'image/png';
+    document.head.appendChild(favicon);
+
     Promise.all([
         loadComponent("main-header", "header.html"),
         loadComponent("main-footer", "footer.html")

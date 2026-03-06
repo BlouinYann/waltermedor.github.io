@@ -2,12 +2,97 @@
 <html lang="fr">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Le Groupe | Walter Medor</title>
     <link rel="stylesheet" href="../style.css">
     <script src="../scripts.js" defer></script>
+    <style>
+        /* --- SECTION MEMBRES --- */
+        .membres-section {
+            margin-top: 80px;
+        }
+
+        .membres-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .membre-card {
+            text-align: center;
+            position: relative;
+        }
+
+        .membre-photo-wrap {
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--color-primary);
+            margin-bottom: 15px;
+            aspect-ratio: 3/4;
+        }
+
+        .membre-photo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+            filter: grayscale(30%) sepia(20%);
+            transition: filter 0.4s ease, transform 0.4s ease;
+            display: block;
+        }
+
+        .membre-card:hover .membre-photo-wrap img {
+            filter: grayscale(0%) sepia(0%);
+            transform: scale(1.05);
+        }
+
+        .membre-photo-wrap::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(transparent, rgba(10, 10, 10, 0.7));
+            pointer-events: none;
+        }
+
+        .membre-nom {
+            font-family: var(--font-title);
+            font-size: 1.6rem;
+            color: var(--color-white);
+            margin: 0 0 5px 0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .membre-instrument {
+            font-family: var(--font-subtitle);
+            font-size: 0.85rem;
+            color: var(--color-secondary);
+            text-transform: lowercase;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .membres-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .membre-nom {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .membres-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -20,39 +105,41 @@
 
             <div class="bio-content">
                 <p class="intro-text">
-                    Walter homme ! Médor chien ! Walter Médor est né et devient le nom d’emprunt choisi par le groupe,
-                    celui d’un personnage fictif mi-homme, mi-chien, un hybride <strong>100% batard</strong>.
+                    Walter homme ! Médor chien ! Walter Médor est né et devient le nom d'emprunt choisi par le groupe,
+                    celui d'un personnage fictif mi-homme, mi-chien, un hybride <strong>100% batard</strong>.
                 </p>
 
                 <p>
-                    De sa tanière et sur les cendres d’un monde en déconstruction Walter Médor contemple son jardin, sa
-                    ville, son territoire sa planète et bien d’autres étendues encore.
+                    De sa tanière et sur les cendres d'un monde en déconstruction Walter Médor contemple son jardin, sa
+                    ville, son territoire sa planète et bien d'autres étendues encore.
                 </p>
 
                 <p>
-                    Cet anti-héros des temps modernes a un avis sur tout et surtout un avis qu’il se dépêche de
+                    Cet anti-héros des temps modernes a un avis sur tout et surtout un avis qu'il se dépêche de
                     divulguer au hasard de ses rencontres, de ses concerts, de ses malaises, de ses vomis…
                 </p>
 
                 <blockquote class="manifesto">
                     "Comme ses semblables Walter Médor est lâche et courageux, riche et pauvre, punk et pieu, beau et
-                    malhonnête et malgré tous ses travers il reste un poète en sommeil, un artiste qui s’ignore."
+                    malhonnête et malgré tous ses travers il reste un poète en sommeil, un artiste qui s'ignore."
                 </blockquote>
 
                 <p>
-                    Parfois engagé, souvent dégagé, il peint dans ses récits le monde tel qu’il le voit depuis le judas
-                    de la porte de sa niche, il brosse le portrait de ce qu’il appelle <strong>« l’idiocratie
-                        »</strong>, berceau de l’amour, de la liberté, de la pornographie, de la fraternité, du fric et
-                    de l’égalité, un monde de paradoxe et d’exubérance, de poésie et d’esthétique, de misère et de
-                    jalousie, de paresse et de mensonges, d’obéissance et de vulgarité…
+                    Parfois engagé, souvent dégagé, il peint dans ses récits le monde tel qu'il le voit depuis le judas
+                    de la porte de sa niche, il brosse le portrait de ce qu'il appelle <strong>« l'idiocratie
+                        »</strong>, berceau de l'amour, de la liberté, de la pornographie, de la fraternité, du fric et
+                    de l'égalité, un monde de paradoxe et d'exubérance, de poésie et d'esthétique, de misère et de
+                    jalousie, de paresse et de mensonges, d'obéissance et de vulgarité…
                 </p>
 
                 <div class="composition">
                     <h3>Musicalement</h3>
                     <p>
-                        Le groupe est composé d’un <strong>batteur subtil mais brutal</strong>, d’un <strong>bassiste
-                            tonitruant</strong> aux sons cosmiques, d’un <strong>violonceliste</strong> qui vien colorer les musiques et d’un <strong>chanteur de variétés rock</strong> qui fait
-                        pleurer sa guitare à six cordes sans mélodie languissante.
+                        Le groupe est composé d'un <strong>batteur subtil mais brutal</strong>, d'un <strong>bassiste
+                            tonitruant</strong> aux sons cosmiques, d'un <strong>violonceliste</strong> qui vient
+                        colorer
+                        les musiques et d'un <strong>chanteur de variétés rock</strong> qui fait pleurer sa guitare à
+                        six cordes sans mélodie languissante.
                     </p>
                 </div>
 
@@ -60,9 +147,49 @@
                     Du rock putain ! Ca crache et ca degueule dans les gamelles !
                 </p>
 
-                <p class="love-question">Et l’amour dans tout ça ?</p>
+                <p class="love-question">Et l'amour dans tout ça ?</p>
             </div>
         </section>
+
+        <!-- SECTION MEMBRES -->
+        <section class="membres-section">
+            <h2>Le Groupe</h2>
+            <div class="membres-grid">
+
+                <div class="membre-card">
+                    <div class="membre-photo-wrap">
+                        <img src="/Images/Pascal.png" alt="Pascal - Batterie">
+                    </div>
+                    <p class="membre-nom">Pascal</p>
+                    <p class="membre-instrument">Batterie</p>
+                </div>
+
+                <div class="membre-card">
+                    <div class="membre-photo-wrap">
+                        <img src="/Images/Toto.png" alt="Toto - Basse">
+                    </div>
+                    <p class="membre-nom">Toto</p>
+                    <p class="membre-instrument">Basse</p>
+                </div>
+
+                <div class="membre-card">
+                    <div class="membre-photo-wrap">
+                        <img src="/Images/Jean.png" alt="Jean - Violoncelle">
+                    </div>
+                    <p class="membre-nom">Jean</p>
+                    <p class="membre-instrument">Violoncelle</p>
+                </div>
+                <div class="membre-card">
+                    <div class="membre-photo-wrap">
+                        <img src="/Images/Christophe.png" alt="Christophe - Chant / Guitare">
+                    </div>
+                    <p class="membre-nom">Christophe</p>
+                    <p class="membre-instrument">Chant / Guitare Élec.</p>
+                </div>
+
+            </div>
+        </section>
+
     </main>
 
     <footer id="main-footer"></footer>
