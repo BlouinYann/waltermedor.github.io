@@ -609,10 +609,11 @@ nav ul li.dropdown:hover .submenu {
     }
 
     .nav-menu {
-        display: flex !important; 
+        display: flex !important;
         position: static;
         height: auto;
         background: none;
+        flex-direction: row;
     }
 
     .nav-menu ul {
@@ -621,51 +622,123 @@ nav ul li.dropdown:hover .submenu {
         gap: 25px;
     }
 
-    /* Le sous-menu s'affiche au survol sur PC */
+    /* Sous-menu caché par défaut sur desktop, même avec le !important mobile */
+    .nav-menu ul li .submenu {
+        display: none !important;
+        position: absolute;
+    }
+
+    /* S'affiche uniquement au survol */
     nav ul li.dropdown:hover .submenu {
-        display: block;
+        display: block !important;
     }
 }
 /* --- CONFIGURATION MOBILE --- */
 @media (max-width: 768px) {
-    /* Le bouton burger est rendu visible par la règle globale en bas du fichier */
-    
-    .nav-menu {
-        display: none; /* Caché par défaut, activé par la classe .active */
-    }
-
-    .nav-menu.active {
+    /* Le bouton burger doit être visible car le JS va l'injecter */
+    .menu-toggle {
         display: flex !important;
     }
 
+    /* Menu plein écran : caché par défaut */
+    .nav-menu {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(10, 10, 10, 0.97);
+        z-index: 1050;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Menu ouvert */
+    .nav-menu.active {
+        display: flex !important;
+        opacity: 1;
+        transform: translateY(0);
+    }
 
     .nav-menu ul {
         flex-direction: column;
-        gap: 25px;
+        gap: 40px;
         text-align: center;
+        list-style: none;
+        padding: 0;
+        margin: 0;
     }
 
     .nav-menu ul li a {
-        font-size: 1.5rem;
+        font-size: 2.2rem;
+        font-family: var(--font-title);
+        color: var(--color-white);
+        text-decoration: none;
+        letter-spacing: 2px;
+        transition: color 0.2s ease;
     }
 
-    /* 2. Sous-menu (Albums) intégré proprement */
+    .nav-menu ul li a:hover {
+        color: var(--color-secondary);
+    }
+
+    /* 2. Sous-menu mobile */
     .nav-menu ul li .submenu {
-        display: block !important; /* Toujours visible si le menu est ouvert */
+        display: block !important;
         position: static;
         transform: none;
-        margin-top: 10px;
+        margin-top: 15px;
         border: none;
         background: none;
+        box-shadow: none;
+    }
+
+    .nav-menu ul li .submenu li {
+        margin: 8px 0;
     }
 
     .nav-menu ul li .submenu li a {
-        font-size: 1.1rem;
+        font-size: 1.3rem;
+        font-family: var(--font-subtitle);
         color: var(--color-secondary);
-        transform: none; /* On enlève la rotation pour la lisibilité mobile */
+        transform: none;
     }
 
-    /* 3. Bouton Burger : styles définis globalement hors media query */
+    /* 3. Bouton Burger */
+    .menu-toggle {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        z-index: 1100;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 10px;
+    }
+
+    .menu-toggle span {
+        display: block;
+        width: 25px;
+        height: 3px;
+        background-color: white;
+        transition: 0.3s;
+    }
+
+    /* Croix quand menu ouvert */
+    .menu-toggle.is-active span:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .menu-toggle.is-active span:nth-child(2) {
+        opacity: 0;
+    }
+    .menu-toggle.is-active span:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
 
     /* 4. Lecteur Audio Mobile */
     .progress-container {
@@ -694,28 +767,13 @@ nav ul li.dropdown:hover .submenu {
         height: auto;
     }
 }
-/* --- BOUTON BURGER : définition complète hors media query --- */
-.menu-toggle {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    z-index: 1100;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 10px;
+/* Force l'affichage du burger si le header est injecté par JS */
+#main-header .menu-toggle {
+    display: flex !important;
 }
 
-.menu-toggle span {
-    display: block;
-    width: 25px;
-    height: 3px;
-    background-color: white;
-    transition: 0.3s;
-}
-
-@media (max-width: 768px) {
-    .menu-toggle {
-        display: flex !important;
+@media (min-width: 769px) {
+    #main-header .menu-toggle {
+        display: none !important;
     }
 }
