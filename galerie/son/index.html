@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Le Groupe | Walter Medor</title>
+<link rel="stylesheet" href="../../style.css">
+<script src="../../scripts.js" defer></script>
+</head>
+
+<body>
+
+    <header id="main-header"></header>
+
+    <main>
+        <section class="audio-section">
+            <h2>Audio</h2>
+            <div class="playlist">
+                <div class="playlist">
+                    <div class="track">
+                        <div class="track-info">
+                            <span class="track-number">01</span>
+                            <span class="track-title">Demain je Serai là</span>
+                        </div>
+                        <div class="custom-player">
+                            <button class="play-pause-btn" data-audio="piste1">▶</button>
+                            <button class="lyrics-btn" data-lyrics="piste1">paroles</button>
+                            <audio id="piste1" src="../../Audio/piste1.mp3"></audio>
+                        </div>
+                    </div>
+
+                    <div class="track">
+                        <div class="track-info">
+                            <span class="track-number">02</span>
+                            <span class="track-title">Dans ton Accordéon</span>
+                        </div>
+                        <div class="custom-player">
+                            <button class="play-pause-btn" data-audio="piste2">▶</button>
+                            <button class="lyrics-btn" data-lyrics="piste2">paroles</button>
+                            <audio id="piste2" src="../../Audio/piste2.mp3"></audio>
+                        </div>
+                    </div>
+
+                    <div class="track">
+                        <div class="track-info">
+                            <span class="track-number">03</span>
+                            <span class="track-title">Attack Médor</span>
+                        </div>
+                        <div class="custom-player">
+                            <button class="play-pause-btn" data-audio="piste3">▶</button>
+                            <button class="lyrics-btn" data-lyrics="piste3">paroles</button>
+                            <audio id="piste3" src="../../Audio/piste3.mp3"></audio>
+                        </div>
+                    </div>
+
+                    <div class="track">
+                        <div class="track-info">
+                            <span class="track-number">04</span>
+                            <span class="track-title">Taxi</span>
+                        </div>
+                        <div class="custom-player">
+                            <button class="play-pause-btn" data-audio="piste4">▶</button>
+                            <button class="lyrics-btn" data-lyrics="piste4">paroles</button>
+                            <audio id="piste4" src="../../Audio/piste4.mp3"></audio>
+                        </div>
+                    </div>
+
+                    <div class="track">
+                        <div class="track-info">
+                            <span class="track-number">05</span>
+                            <span class="track-title">Par la Fenêtre de mon Auto</span>
+                        </div>
+                        <div class="custom-player">
+                            <button class="play-pause-btn" data-audio="piste5">▶</button>
+                            <button class="lyrics-btn" data-lyrics="piste5">paroles</button>
+                            <audio id="piste5" src="../../Audio/piste5.mp3"></audio>
+                        </div>
+                    </div>
+
+                    <div class="track">
+                        <div class="track-info">
+                            <span class="track-number">06</span>
+                            <span class="track-title">T'es Moche</span>
+                        </div>
+                        <div class="custom-player">
+                            <button class="play-pause-btn" data-audio="piste6">▶</button>
+                            <button class="lyrics-btn" data-lyrics="piste6">paroles</button>
+                            <audio id="piste6" src="../../Audio/piste6.mp3"></audio>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer id="main-footer"></footer>
+
+    <!-- MODALE PAROLES -->
+    <div id="lyrics-modal" class="lyrics-modal-overlay" style="display:none;">
+        <div class="lyrics-modal-box">
+            <button class="lyrics-modal-close" id="lyrics-close">✕</button>
+            <h3 class="lyrics-modal-title" id="lyrics-title"></h3>
+            <div class="lyrics-modal-content" id="lyrics-content"></div>
+        </div>
+    </div>
+
+    <script>
+    const lyricsData = {
+        piste1: { title: "Demain je Serai là", html: `
+<div class="lyrics-strophe">
+    <p>Demain je serai là allongé sur ce lit</p>
+    <p>Une journée de tourment pour une nuit de répit</p>
+    <p>D'abord un petit verre et mon corps se redresse</p>
+    <p>Retrouver mes fonctions pour traquer la sagesse, <em>demain</em></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>Demain je serai las de ne plus supporter</p>
+    <p>Ces jours de face à face avec une conscience erronée</p>
+    <p>Encore un petit verre et l'esprit s'engourdit</p>
+    <p>L'ivresse se mérite se construit comme un rite, <em>demain</em></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>Et demain si je souffre se seront les maux du bonheur</p>
+    <p>Illusoires comme un gouffre habillé de couleur</p>
+    <p>Encore un petit verre et mon crâne se défonce</p>
+    <p>Allongé face à terre j'attendrai la réponse, <em>demain</em></p>
+</div>
+
+<blockquote class="lyrics-pont">
+    Et je rêve éveillé je vis dans un mirage<br>
+    Les méninges imbibées par ces jours de ménage<br>
+    Les yeux décolorés comme ceux d'un oiseau en cage<br>
+    Suppliant implorant le dompteur de nuages<br>
+    <strong>Un départ sans bagage un voyage périlleux</strong><br>
+    <strong>Pour une vie sans nuage, un paradis précieux</strong><br>
+    Où l'orchestre céleste viendra alors s'accorder<br>
+    À mes jours de paresse ceux d'un rêveur aviné
+</blockquote>
+
+<div class="lyrics-strophe lyrics-final">
+    <p>Demain je serai là allongé sur ce lit</p>
+    <p>Une journée de tourment pour une nuit de répit</p>
+    <p>D'abord un petit verre et mon corps se redresse</p>
+    <p>Retrouver mes fonctions pour traquer la sagesse, <em>demain</em></p>
+</div>
+` },
+        piste2: { title: "Dans ton Accordéon", html: `
+<div class="lyrics-strophe">
+    <p>Juste après le néant</p>
+    <p>Il y a eu la création</p>
+    <p>Dieu est-il existant</p>
+    <p>En voilà une question</p>
+    <p>Moi je reprends des nouilles</p>
+    <p>Et un petit canon</p>
+    <p>Tu parles d'une entourbrouille</p>
+    <p>Ce n'est que religion</p>
+</div>
+
+<blockquote class="lyrics-pont">
+    Alors nous on rigole — c'est la récréation<br>
+    Car pour refaire le monde<br>
+    Faut faire la <strong>décréation</strong><br>
+    Alors nous on s'envole au fond de nos chansons<br>
+    Deux ou trois verres suffisent,<br>
+    <strong>Prends ton accordéon !</strong>
+</blockquote>
+
+<div class="lyrics-strophe">
+    <p>Quand mes nuits font naufrage</p>
+    <p>J'attends le petit jour</p>
+    <p>Je ne suis qu'un oiseau en cage</p>
+    <p>Qui fait peur à l'amour</p>
+    <p>Au fond des saxophones</p>
+    <p>Ou dans l'accordéon</p>
+    <p>J'aime les oiseaux qui volent</p>
+    <p>Au-delà des chansons</p>
+</div>
+
+<blockquote class="lyrics-pont">
+    Alors nous on s'envole, on s'accroche à tes mots<br>
+    On traine nos casseroles, nos bites et nos couteaux<br>
+    Alors on rafistole au fond de nos cerveaux<br>
+    <strong>On découd on recole, des pansements sur nos maux (mots) !</strong>
+</blockquote>
+
+<div class="lyrics-strophe">
+    <p>Quand j'en vois deux qui passent</p>
+    <p>Mon sang ne fait qu'un tour</p>
+    <p>S'il faut refaire le monde je ne passerai pas mon tour</p>
+    <p>C'est une question de survie</p>
+    <p>La planète n'a plus le choix</p>
+    <p>Moi qui ratais ma vie</p>
+    <p>J'ai retrouvé ma voie</p>
+    <p>Même si on exabuse, c'est un sujet sérieux</p>
+    <p>Ne croyez pas qu'on s'use</p>
+    <p>Et qu'on ferme les yeux</p>
+</div>
+
+<blockquote class="lyrics-pont">
+    Alors nous on bricole autour de nos chansons<br>
+    Il y a des oiseaux qui volent<br>
+    <strong>Dans ton accordéon !</strong>
+</blockquote>
+
+<div class="lyrics-strophe">
+    <p>Si on rêvait plus fort</p>
+    <p>On pourrait constater</p>
+    <p>Qu'il vaut mieux faire l'amour</p>
+    <p>Plutôt que se bagarrer</p>
+    <p>Si on rêvait plus fort</p>
+    <p>On pourrait constater</p>
+    <p>Que le monde n'est pas mort</p>
+    <p>Mais à réinventer</p>
+</div>
+
+<div class="lyrics-strophe lyrics-final">
+    <p>Nous on s'agite sur les podiums</p>
+    <p>Ça nous fait croire, qu'on est des hommes</p>
+    <p><em>Il n'y a plus d'oiseaux dans les chansons</em></p>
+    <p><strong>Fais nous rêver, dans ton accordéon</strong></p>
+</div>
+` },
+        piste3: { title: "Attack Médor", html: `
+<div class="lyrics-strophe">
+    <p>La nuit les chiens hurlent à la mort</p>
+    <p>Peut-être veulent-ils manger la lune</p>
+    <p>Peut-être que la lune est bonne</p>
+    <p><em>Peut-être. Mais on ne le sait pas</em></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>D'ennui, les chiens hurlent à la mort</p>
+    <p>Peut-être en ont-ils assez de leurs vies</p>
+    <p>Peut-être en ont-ils assez des hommes</p>
+    <p><em>Peut-être mais on ne le sait pas</em></p>
+</div>
+
+<blockquote class="lyrics-pont">
+    <strong>Assis couché, assis couché debout !</strong><br>
+    Je n'en peux plus de ce vieux chien je n'en peux plus de ce vaurien<br>
+    <strong>Assis couché, assis couché debout !</strong><br>
+    Je n'en peux plus de ce clébard quand il détruit tous mes placards<br>
+    <strong>Assis couché, assis couché debout !</strong><br>
+    Je n'en peux plus de ce vieux chien je n'en peux plus de ce vaurien<br>
+    <strong>Assis couché, assis couché debout !</strong><br>
+    C'est vrai qu'il est con comme un âne alors que les autres bossent dans les douanes
+</blockquote>
+
+<div class="lyrics-strophe lyrics-final">
+    <p>La nuit les chiens hurlent à la mort</p>
+    <p>Peut-être veulent-ils manger la lune</p>
+    <p>Peut-être que la lune est bonne</p>
+    <p><em>Peut-être. Mais on ne le sait pas</em></p>
+</div>
+` },
+        piste4: { title: "Taxi", html: `
+<div class="lyrics-strophe">
+    <p>Taxi emmène moi</p>
+    <p>Là où le soleil brille la nuit</p>
+    <p>Là où il ne fait jamais froid</p>
+    <p>Là où le ciel n'est jamais gris</p>
+    <p>Montre-moi le bout du chemin</p>
+    <p>Montre-moi tous les raccourcis</p>
+    <p>Puis conduis-moi jusqu'à</p>
+    <p><em>Demain la chance me sourit</em></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>Taxi envole-toi, quitte</p>
+    <p>La terre, ce confetti</p>
+    <p>Oh je t'en prie emmène-moi</p>
+    <p>Fuyons vers d'autres galaxies</p>
+    <p>Taxi réponds-moi</p>
+    <p>Oui réponds-moi je t'en supplie</p>
+    <p>J'ai de la route et puis j'ai froid</p>
+    <p><em>Demain la chance me sourit</em></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>Taxi entends-tu</p>
+    <p>C'est le rugissement de la terre</p>
+    <p>Les hommes sont devenus fous</p>
+    <p>Ils jouent au foot ou à la guerre</p>
+    <p>Alors laissons-les ici-bas</p>
+    <p>À patauger dans leurs conneries</p>
+    <p>À chanter hip hip hourra</p>
+    <p><em>Demain la chance me sourit</em></p>
+</div>
+
+<div class="lyrics-strophe lyrics-final">
+    <p>Taxi dépose-moi</p>
+    <p>Nous y voilà tout est fini</p>
+    <p>Je ne connais pas cet endroit</p>
+    <p>Mais cela ressemble au paradis</p>
+    <p>Taxi descends-moi</p>
+    <p>Nous y voilà tout est fini</p>
+    <p>Je veux danser une dernière fois</p>
+    <p><strong><em>Demain la chance me sourit</em></strong></p>
+</div>
+` },
+        piste5: { title: "Par la Fenêtre de mon Auto", html: `
+<div class="lyrics-strophe">
+    <p>Par la fenêtre de mon auto</p>
+    <p>Je vois passer des gens pressés</p>
+    <p>Ils semblent nager sur le dos</p>
+    <p>Ils semblent marcher à côté</p>
+    <p>De leurs chaussures à leur pointure</p>
+    <p>La tête au fond de leurs souliers</p>
+    <p>Sur une route qui sent l'usure</p>
+    <p><em>Sur un trottoir trop abimé</em></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>Par la fenêtre de mon auto</p>
+    <p>Je vois des immeubles carrés</p>
+    <p>La géométrie c'est si beau</p>
+    <p>Je veux apprendre à dessiner</p>
+    <p>Des sourires sur tous les visages</p>
+    <p>Des ventres ronds aux affamés</p>
+    <p>Des cœurs aux rapaces de passage</p>
+    <p><em>La vie c'est dur à colorier</em></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>Par la fenêtre de mon auto</p>
+    <p>Je prends ce qu'il faut pour rêver</p>
+    <p>Je respire fort et puis je plonge</p>
+    <p>Comme un nageur de brasse coulée</p>
+    <p>Lui qui s'enivre dans d'autres mondes</p>
+    <p><em>La vie c'est un peu une apnée</em></p>
+    <p>Le cerveau est une petite bombe</p>
+    <p><strong>Faut se réveiller pour ne pas crever</strong></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>Par la fenêtre de mon auto</p>
+    <p>Je vois des nuages gris foncés</p>
+    <p>Je vois le soleil sur le dos</p>
+    <p>Je vois mourir cette journée</p>
+    <p>Beaucoup trop longue et sans issue</p>
+    <p>Dans un ennui apprivoisé</p>
+    <p>Au dénouement trop attendu</p>
+    <p><em>C'est la nuit qui vient de tomber</em></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>Par la fenêtre de mon auto</p>
+    <p>Je vois des étoiles scintiller</p>
+    <p>Je fais un clin d'œil à la lune</p>
+    <p>Elle me regarde d'un air gêné</p>
+    <p>La nuit est un mouchoir jetable</p>
+    <p>Où mon ombre ne veut plus marcher</p>
+    <p>À mes côtés — c'est regrettable —</p>
+    <p><em>Toujours s'enfuir, accélérer</em></p>
+</div>
+
+<div class="lyrics-strophe lyrics-final">
+    <p>Par la fenêtre de mon auto</p>
+    <p>Un paysage veut défiler</p>
+    <p>Je baisse ma vitre il fait si beau</p>
+    <p>Je l'invite à m'accompagner</p>
+    <p>Par la fenêtre de mon auto</p>
+    <p>Des oiseaux volent par milliers</p>
+    <p>Ils me disent que la terre est ronde</p>
+    <p><strong><em>Mais dans ma tête tout est carré</em></strong></p>
+</div>
+` },
+        piste6: { title: "T'es Moche", html: `
+<div class="lyrics-strophe">
+    <p>T'es moche un peu, mais je t'aime quand même</p>
+    <p>Même si parfois tu me fous la migraine</p>
+    <p>À t'entendre aboyer, gémir, à t'agiter</p>
+    <p>Ne joue pas avec le feu !</p>
+    <p><em>Et tu mords la queue…</em></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>T'es moche toujours et ça rime avec amour</p>
+    <p>Même si parfois je te déteste sans détours</p>
+    <p>Te voir à quatre pattes, cela me rend rouge écarlate</p>
+    <p>Tu vas me rendre fou, <em>je reste dans mon trou…</em></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>T'es moche tout le temps quand tu montres les dents</p>
+    <p>Même si parfois j'ai songé un instant</p>
+    <p>À te tordre le cou, à en finir et tout</p>
+    <p><strong>Ne joue pas avec le feu, ou bien je t'arrache les yeux…</strong></p>
+</div>
+
+<div class="lyrics-strophe">
+    <p>T'es moche encore et tu le seras jusqu'à ta mort</p>
+    <p>Même si parfois je ressens du remord</p>
+    <p>Cesse un peu de japper, de te traîner à mes pieds</p>
+    <p>Tu vas me rendre fou, <em>je crois que je t'aime et c'est tout…</em></p>
+</div>
+
+<blockquote class="lyrics-pont">
+    Je n'ai pas peur des miroirs, je n'ai même pas peur de vous<br>
+    Je n'aime pas les histoires à dormir debout…<br>
+    Je n'ai même pas peur du noir et je n'ai pas peur des hiboux<br>
+    <strong>J'aime bien les histoires d'amour et c'est tout…</strong>
+</blockquote>
+` },
+    };
+
+    document.querySelectorAll('.lyrics-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const key = btn.getAttribute('data-lyrics');
+            const data = lyricsData[key];
+            if (!data) return;
+            document.getElementById('lyrics-title').textContent = data.title;
+            document.getElementById('lyrics-content').innerHTML = data.html || '';
+            document.getElementById('lyrics-modal').style.display = 'flex';
+        });
+    });
+
+    document.getElementById('lyrics-close').addEventListener('click', () => {
+        document.getElementById('lyrics-modal').style.display = 'none';
+    });
+
+    document.getElementById('lyrics-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('lyrics-modal')) {
+            document.getElementById('lyrics-modal').style.display = 'none';
+        }
+    });
+    </script>
+
+</body>
+
+</html>
