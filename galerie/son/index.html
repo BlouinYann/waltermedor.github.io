@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Le Groupe | Walter Medor</title>
-<link rel="stylesheet" href="../../style.css">
-<script src="../../scripts.js" defer></script>
+    <link rel="stylesheet" href="../../style.css">
+    <script src="../../scripts.js" defer></script>
 </head>
 
 <body>
@@ -34,42 +34,6 @@
                     <div class="track">
                         <div class="track-info">
                             <span class="track-number">02</span>
-                            <span class="track-title">Dans ton Accordéon</span>
-                        </div>
-                        <div class="custom-player">
-                            <button class="play-pause-btn" data-audio="piste2">▶</button>
-                            <button class="lyrics-btn" data-lyrics="piste2">paroles</button>
-                            <audio id="piste2" src="../../Audio/piste2.mp3"></audio>
-                        </div>
-                    </div>
-
-                    <div class="track">
-                        <div class="track-info">
-                            <span class="track-number">03</span>
-                            <span class="track-title">Attack Médor</span>
-                        </div>
-                        <div class="custom-player">
-                            <button class="play-pause-btn" data-audio="piste3">▶</button>
-                            <button class="lyrics-btn" data-lyrics="piste3">paroles</button>
-                            <audio id="piste3" src="../../Audio/piste3.mp3"></audio>
-                        </div>
-                    </div>
-
-                    <div class="track">
-                        <div class="track-info">
-                            <span class="track-number">04</span>
-                            <span class="track-title">Taxi</span>
-                        </div>
-                        <div class="custom-player">
-                            <button class="play-pause-btn" data-audio="piste4">▶</button>
-                            <button class="lyrics-btn" data-lyrics="piste4">paroles</button>
-                            <audio id="piste4" src="../../Audio/piste4.mp3"></audio>
-                        </div>
-                    </div>
-
-                    <div class="track">
-                        <div class="track-info">
-                            <span class="track-number">05</span>
                             <span class="track-title">Par la Fenêtre de mon Auto</span>
                         </div>
                         <div class="custom-player">
@@ -81,7 +45,32 @@
 
                     <div class="track">
                         <div class="track-info">
-                            <span class="track-number">06</span>
+                            <span class="track-number">03</span>
+                            <span class="track-title">Taxi</span>
+                        </div>
+                        <div class="custom-player">
+                            <button class="play-pause-btn" data-audio="piste4">▶</button>
+                            <button class="lyrics-btn" data-lyrics="piste4">paroles</button>
+                            <audio id="piste4" src="../../Audio/piste4.mp3"></audio>
+                        </div>
+                    </div>
+
+                    <div class="track">
+                        <div class="track-info">
+                            <span class="track-number">04</span>
+                            <span class="track-title">Attack Médor</span>
+                        </div>
+                        <div class="custom-player">
+                            <button class="play-pause-btn" data-audio="piste3">▶</button>
+                            <button class="lyrics-btn" data-lyrics="piste3">paroles</button>
+                            <audio id="piste3" src="../../Audio/piste3.mp3"></audio>
+                        </div>
+                    </div>
+
+
+                    <div class="track">
+                        <div class="track-info">
+                            <span class="track-number">05</span>
                             <span class="track-title">T'es Moche</span>
                         </div>
                         <div class="custom-player">
@@ -108,8 +97,9 @@
     </div>
 
     <script>
-    const lyricsData = {
-        piste1: { title: "Demain je Serai là", html: `
+        const lyricsData = {
+            piste1: {
+                title: "Demain je Serai là", html: `
 <div class="lyrics-strophe">
     <p>Demain je serai là allongé sur ce lit</p>
     <p>Une journée de tourment pour une nuit de répit</p>
@@ -149,7 +139,8 @@
     <p>Retrouver mes fonctions pour traquer la sagesse, <em>demain</em></p>
 </div>
 ` },
-        piste2: { title: "Dans ton Accordéon", html: `
+            piste2: {
+                title: "Dans ton Accordéon", html: `
 <div class="lyrics-strophe">
     <p>Juste après le néant</p>
     <p>Il y a eu la création</p>
@@ -225,7 +216,8 @@
     <p><strong>Fais nous rêver, dans ton accordéon</strong></p>
 </div>
 ` },
-        piste3: { title: "Attack Médor", html: `
+            piste3: {
+                title: "Attack Médor", html: `
 <div class="lyrics-strophe">
     <p>La nuit les chiens hurlent à la mort</p>
     <p>Peut-être veulent-ils manger la lune</p>
@@ -258,7 +250,8 @@
     <p><em>Peut-être. Mais on ne le sait pas</em></p>
 </div>
 ` },
-        piste4: { title: "Taxi", html: `
+            piste4: {
+                title: "Taxi", html: `
 <div class="lyrics-strophe">
     <p>Taxi emmène moi</p>
     <p>Là où le soleil brille la nuit</p>
@@ -303,7 +296,8 @@
     <p><strong><em>Demain la chance me sourit</em></strong></p>
 </div>
 ` },
-        piste5: { title: "Par la Fenêtre de mon Auto", html: `
+            piste5: {
+                title: "Par la Fenêtre de mon Auto", html: `
 <div class="lyrics-strophe">
     <p>Par la fenêtre de mon auto</p>
     <p>Je vois passer des gens pressés</p>
@@ -370,7 +364,8 @@
     <p><strong><em>Mais dans ma tête tout est carré</em></strong></p>
 </div>
 ` },
-        piste6: { title: "T'es Moche", html: `
+            piste6: {
+                title: "T'es Moche", html: `
 <div class="lyrics-strophe">
     <p>T'es moche un peu, mais je t'aime quand même</p>
     <p>Même si parfois tu me fous la migraine</p>
@@ -407,28 +402,28 @@
     <strong>J'aime bien les histoires d'amour et c'est tout…</strong>
 </blockquote>
 ` },
-    };
+        };
 
-    document.querySelectorAll('.lyrics-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const key = btn.getAttribute('data-lyrics');
-            const data = lyricsData[key];
-            if (!data) return;
-            document.getElementById('lyrics-title').textContent = data.title;
-            document.getElementById('lyrics-content').innerHTML = data.html || '';
-            document.getElementById('lyrics-modal').style.display = 'flex';
+        document.querySelectorAll('.lyrics-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.getAttribute('data-lyrics');
+                const data = lyricsData[key];
+                if (!data) return;
+                document.getElementById('lyrics-title').textContent = data.title;
+                document.getElementById('lyrics-content').innerHTML = data.html || '';
+                document.getElementById('lyrics-modal').style.display = 'flex';
+            });
         });
-    });
 
-    document.getElementById('lyrics-close').addEventListener('click', () => {
-        document.getElementById('lyrics-modal').style.display = 'none';
-    });
-
-    document.getElementById('lyrics-modal').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('lyrics-modal')) {
+        document.getElementById('lyrics-close').addEventListener('click', () => {
             document.getElementById('lyrics-modal').style.display = 'none';
-        }
-    });
+        });
+
+        document.getElementById('lyrics-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('lyrics-modal')) {
+                document.getElementById('lyrics-modal').style.display = 'none';
+            }
+        });
     </script>
 
 </body>

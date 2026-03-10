@@ -503,14 +503,6 @@ footer {
     text-transform: uppercase;
 }
 
-.love-question {
-    font-family: var(--font-subtitle);
-    text-align: right;
-    margin-top: 20px;
-    font-style: italic;
-    color: var(--color-secondary);
-}
-
 strong {
     color: var(--color-secondary);
 }
