@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <link rel="icon" href="https://enchantedkingdoms.eu/favicon.ico" type="image/x-icon">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin — StagePanel</title>
+  <style>
+    :root { color-scheme: dark; color: #f3efe4; background: #07101b; font-family: 'Work Sans', Arial, Helvetica, sans-serif; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(79,216,201,0.12), transparent 30%),
+                  linear-gradient(180deg, #07101b 0%, #04090f 100%);
+      padding: 32px 20px 60px;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; }
+    header.topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px; gap: 16px; flex-wrap: wrap;
+    }
+    header.topbar h1 { margin: 0; font-size: 1.5rem; letter-spacing: 0.08em; color: #f3d48c; text-transform: uppercase; font-family: 'Cinzel', serif; }
+    header.topbar .who { color: #93a0ba; font-size: 0.85rem; }
+    .btn {
+      border: 0; border-radius: 12px; padding: 10px 16px; font-weight: 600; cursor: pointer;
+      letter-spacing: 0.03em; font-size: 0.88rem; transition: transform .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-gold { background: linear-gradient(135deg, #e7b75f, #f3d48c); color: #111214; }
+    .btn-ghost { background: rgba(147,160,186,0.12); color: #f3efe4; border: 1px solid rgba(147,160,186,0.2); }
+    .btn-danger { background: rgba(224,86,86,0.15); color: #f3a9a9; border: 1px solid rgba(224,86,86,0.35); }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+    .card {
+      background: rgba(16, 23, 41, 0.95); border: 1px solid rgba(231,183,95,0.14);
+      border-radius: 20px; padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      margin-bottom: 24px;
+    }
+    .card h2 { margin: 0 0 18px; font-size: 1.1rem; color: #e7b75f; letter-spacing: 0.05em; font-family: 'Cinzel', serif; }
+
+    form.concert-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    form.concert-form .full { grid-column: 1 / -1; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: #93a0ba; }
+    .field input {
+      min-height: 44px; border-radius: 12px; border: 1px solid rgba(147,160,186,0.18);
+      background: rgba(16,23,41,0.9); color: #f3efe4; font-size: 0.92rem; padding: 10px 12px;
+    }
+    .field input:focus { outline: none; border-color: #4fd8c9; box-shadow: 0 0 0 3px rgba(79,216,201,0.12); }
+    .field-check { flex-direction: row; align-items: center; gap: 10px; }
+    .field-check input { width: 18px; height: 18px; accent-color: #4fd8c9; }
+    .field-check label { text-transform: none; letter-spacing: 0; font-size: 0.9rem; color: #b6c1d1; }
+
+    .form-actions { grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 6px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 12px 10px; font-size: 0.88rem; border-bottom: 1px solid rgba(147,160,186,0.12); }
+    th { color: #93a0ba; font-weight: 600; font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    td.actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 600; }
+    .badge-live { background: rgba(79,216,201,0.15); color: #4fd8c9; }
+    .badge-draft { background: rgba(147,160,186,0.15); color: #93a0ba; }
+    .empty { color: #7a8aa4; font-size: 0.9rem; padding: 20px 0; text-align: center; }
+    .loading-gate {
+      position: fixed; inset: 0; background: #07101b; display: flex; align-items: center; justify-content: center;
+      color: #93a0ba; font-size: 0.95rem; z-index: 50;
+    }
+    @media (max-width: 640px) {
+      form.concert-form { grid-template-columns: 1fr; }
+      td.actions { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-gate" id="loadingGate">Vérification de la session…</div>
+
+  <div class="wrap" id="appWrap" style="display:none;">
+    <header class="topbar">
+      <h1>StagePanel — Admin</h1>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <span class="who" id="whoami"></span>
+        <button class="btn btn-ghost" id="logoutBtn">Se déconnecter</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2 id="formTitle">Ajouter une date de concert</h2>
+      <form class="concert-form" id="concertForm">
+        <input type="hidden" id="concertId">
+        <div class="field">
+          <label for="date">Date</label>
+          <input type="date" id="date" required>
+        </div>
+        <div class="field">
+          <label for="ville">Ville</label>
+          <input type="text" id="ville" placeholder="Nantes" required>
+        </div>
+        <div class="field">
+          <label for="salle">Salle</label>
+          <input type="text" id="salle" placeholder="Le Ferrailleur">
+        </div>
+        <div class="field">
+          <label for="lien">Lien billetterie</label>
+          <input type="url" id="lien" placeholder="https://...">
+        </div>
+        <div class="field field-check full">
+          <input type="checkbox" id="publie" checked>
+          <label for="publie">Visible sur le site public</label>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-gold" id="saveBtn">Enregistrer</button>
+          <button type="button" class="btn btn-ghost" id="cancelEditBtn" style="display:none;">Annuler</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Dates de concert</h2>
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Ville</th><th>Salle</th><th>Statut</th><th></th></tr>
+        </thead>
+        <tbody id="concertRows"></tbody>
+      </table>
+      <div class="empty" id="emptyState" style="display:none;">Aucune date pour le moment.</div>
+    </section>
+  </div>
+
+  <script type="module">
+    import {
+      auth, db, onAuthStateChanged, signOut,
+      collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy
+    } from './firebase-init.js';
+
+    const loadingGate = document.getElementById('loadingGate');
+    const appWrap = document.getElementById('appWrap');
+    const whoami = document.getElementById('whoami');
+
+    // Garde d'authentification : redirige si non connecté
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      whoami.textContent = user.email;
+      loadingGate.style.display = 'none';
+      appWrap.style.display = 'block';
+      startListening();
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = 'login.html';
+    });
+
+    // --- Gestion du formulaire ---
+    const form = document.getElementById('concertForm');
+    const formTitle = document.getElementById('formTitle');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const concertsCol = collection(db, 'concerts');
+
+    function resetForm() {
+      form.reset();
+      document.getElementById('concertId').value = '';
+      document.getElementById('publie').checked = true;
+      formTitle.textContent = 'Ajouter une date de concert';
+      cancelEditBtn.style.display = 'none';
+    }
+
+    cancelEditBtn.addEventListener('click', resetForm);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('concertId').value;
+      const data = {
+        date: document.getElementById('date').value,
+        ville: document.getElementById('ville').value.trim(),
+        salle: document.getElementById('salle').value.trim(),
+        lien: document.getElementById('lien').value.trim(),
+        publie: document.getElementById('publie').checked
+      };
+      if (id) {
+        await updateDoc(doc(db, 'concerts', id), data);
+      } else {
+        await addDoc(concertsCol, data);
+      }
+      resetForm();
+    });
+
+    function editConcert(c) {
+      document.getElementById('concertId').value = c.id;
+      document.getElementById('date').value = c.date || '';
+      document.getElementById('ville').value = c.ville || '';
+      document.getElementById('salle').value = c.salle || '';
+      document.getElementById('lien').value = c.lien || '';
+      document.getElementById('publie').checked = !!c.publie;
+      formTitle.textContent = 'Modifier la date';
+      cancelEditBtn.style.display = 'inline-block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteConcert(id) {
+      if (!confirm('Supprimer définitivement cette date ?')) return;
+      await deleteDoc(doc(db, 'concerts', id));
+    }
+
+    // --- Liste en temps réel ---
+    function startListening() {
+      const q = query(concertsCol, orderBy('date', 'asc'));
+      onSnapshot(q, (snapshot) => {
+        const rows = document.getElementById('concertRows');
+        const emptyState = document.getElementById('emptyState');
+        rows.innerHTML = '';
+
+        if (snapshot.empty) {
+          emptyState.style.display = 'block';
+          return;
+        }
+        emptyState.style.display = 'none';
+
+        snapshot.forEach((docSnap) => {
+          const c = { id: docSnap.id, ...docSnap.data() };
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${formatDate(c.date)}</td>
+            <td>${escapeHtml(c.ville || '')}</td>
+            <td>${escapeHtml(c.salle || '')}</td>
+            <td><span class="badge ${c.publie ? 'badge-live' : 'badge-draft'}">${c.publie ? 'Publié' : 'Brouillon'}</span></td>
+            <td class="actions">
+              <button class="btn btn-ghost btn-sm" data-action="edit">Modifier</button>
+              <button class="btn btn-danger btn-sm" data-action="delete">Supprimer</button>
+            </td>
+          `;
+          tr.querySelector('[data-action="edit"]').addEventListener('click', () => editConcert(c));
+          tr.querySelector('[data-action="delete"]').addEventListener('click', () => deleteConcert(c.id));
+          rows.appendChild(tr);
+        });
+      });
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso + 'T00:00:00');
+      return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
