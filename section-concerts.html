@@ -1,0 +1,55 @@
+<!--
+  À insérer dans index.html, par exemple juste avant la section "gallery-section".
+  Le CSS correspondant (.concerts-section, .concert-item, etc.) est déjà inclus
+  dans le bloc style-admin-addon.css à coller dans ton style.css.
+  Le script ci-dessous doit rester tel quel dans la page (juste avant </body>) :
+  un import Firebase ne peut pas être mis dans scripts.js sans que ce fichier
+  soit lui-même chargé en type="module".
+-->
+<section class="concerts-section">
+    <h2>Prochaines dates</h2>
+    <ul class="concerts-list" id="concertsList">
+        <li class="concerts-empty">Chargement des dates…</li>
+    </ul>
+</section>
+
+<script type="module">
+  import { db, collection, query, where, orderBy, onSnapshot } from './firebase-init.js';
+
+  const list = document.getElementById('concertsList');
+  const today = new Date().toISOString().slice(0, 10);
+
+  const q = query(
+    collection(db, 'concerts'),
+    where('publie', '==', true),
+    where('date', '>=', today),
+    orderBy('date', 'asc')
+  );
+
+  onSnapshot(q, (snapshot) => {
+    list.innerHTML = '';
+    if (snapshot.empty) {
+      list.innerHTML = '<li class="concerts-empty">Aucune date programmée pour le moment.</li>';
+      return;
+    }
+    snapshot.forEach((docSnap) => {
+      const c = docSnap.data();
+      const d = new Date(c.date + 'T00:00:00');
+      const dateStr = d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+      const li = document.createElement('li');
+      li.className = 'concert-item';
+      li.innerHTML = `
+        <span class="concert-date">${dateStr}</span>
+        <span class="concert-ville">${escapeHtml(c.ville || '')}${c.codePostal ? ' (' + escapeHtml(c.codePostal) + ')' : ''}${c.salle ? ' — ' + escapeHtml(c.salle) : ''}</span>
+        ${c.lien ? `<a class="concert-link" href="${escapeHtml(c.lien)}" target="_blank" rel="noopener">Billetterie</a>` : ''}
+      `;
+      list.appendChild(li);
+    });
+  });
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>

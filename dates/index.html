@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dates | Walter Medor</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../scripts.js" defer></script>
+</head>
+
+<body>
+
+    <header id="main-header"></header>
+
+    <main>
+        <section class="dates-section">
+            <h2>Dates</h2>
+
+            <div class="dates-filters">
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label for="filtre-du">à partir du</label>
+                        <input type="date" id="filtre-du">
+                    </div>
+                    <div class="form-group">
+                        <label for="filtre-au">jusqu'au</label>
+                        <input type="date" id="filtre-au">
+                    </div>
+                    <div class="form-group city-autocomplete-wrap">
+                        <label for="filtre-ville">autour de</label>
+                        <input type="text" id="filtre-ville" placeholder="Une ville..." autocomplete="off">
+                        <input type="hidden" id="filtre-lat">
+                        <input type="hidden" id="filtre-lon">
+                        <ul class="city-suggestions" id="filtreSuggestions" hidden></ul>
+                    </div>
+                    <div class="form-group">
+                        <label for="filtre-rayon">rayon (km)</label>
+                        <select id="filtre-rayon">
+                            <option value="">— peu importe —</option>
+                            <option value="25">25 km</option>
+                            <option value="50">50 km</option>
+                            <option value="100">100 km</option>
+                            <option value="250">250 km</option>
+                            <option value="500">500 km</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filters-actions">
+                    <button type="button" class="form-submit filters-btn" id="btnMaPosition">Utiliser ma position</button>
+                    <button type="button" class="filters-reset" id="btnReset">Réinitialiser les filtres</button>
+                </div>
+            </div>
+
+            <h3 class="dates-subtitle">Prochaines Dates</h3>
+            <ul class="concerts-list" id="upcomingList">
+                <li class="concerts-empty">Chargement des dates…</li>
+            </ul>
+
+            <h3 class="dates-subtitle dates-subtitle-past">Anciennes Dates</h3>
+            <ul class="concerts-list concerts-list-past" id="pastList">
+                <li class="concerts-empty">Chargement des dates…</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer id="main-footer"></footer>
+
+    <script type="module">
+        import { db, collection, query, where, orderBy, onSnapshot } from '../firebase-init.js';
+
+        const upcomingList = document.getElementById('upcomingList');
+        const pastList = document.getElementById('pastList');
+        const today = new Date().toISOString().slice(0, 10);
+
+        let allUpcoming = [];
+        let allPast = [];
+
+        const q = query(
+            collection(db, 'concerts'),
+            where('publie', '==', true),
+            orderBy('date', 'asc')
+        );
+
+        onSnapshot(q, (snapshot) => {
+            allUpcoming = [];
+            allPast = [];
+
+            snapshot.forEach((docSnap) => {
+                const c = docSnap.data();
+                if (c.date >= today) {
+                    allUpcoming.push(c);
+                } else {
+                    allPast.push(c);
+                }
+            });
+
+            allPast.reverse(); // la date passée la plus récente en premier
+            renderPast();
+            applyFilters();
+        });
+
+        function renderPast() {
+            pastList.innerHTML = '';
+            if (!allPast.length) {
+                pastList.innerHTML = '<li class="concerts-empty">Aucune date passée à afficher.</li>';
+                return;
+            }
+            allPast.forEach((c) => {
+                pastList.appendChild(buildItem(c, false));
+            });
+        }
+
+        function buildItem(c, withLink) {
+            const d = new Date(c.date + 'T00:00:00');
+            const dateStr = d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const li = document.createElement('li');
+            li.className = 'concert-item';
+            li.innerHTML = `
+                <span class="concert-date">${dateStr}</span>
+                <span class="concert-ville">${escapeHtml(c.ville || '')}${c.codePostal ? ' (' + escapeHtml(c.codePostal) + ')' : ''}${c.salle ? ' — ' + escapeHtml(c.salle) : ''}</span>
+                ${withLink && c.lien ? `<a class="concert-link" href="${escapeHtml(c.lien)}" target="_blank" rel="noopener">Billetterie</a>` : ''}
+            `;
+            return li;
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // --- Filtres : période + rayon autour d'une ville ---
+        const duInput = document.getElementById('filtre-du');
+        const auInput = document.getElementById('filtre-au');
+        const villeInput = document.getElementById('filtre-ville');
+        const latInput = document.getElementById('filtre-lat');
+        const lonInput = document.getElementById('filtre-lon');
+        const rayonSelect = document.getElementById('filtre-rayon');
+        const suggestionsList = document.getElementById('filtreSuggestions');
+
+        function distanceKm(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function applyFilters() {
+            const du = duInput.value || null;
+            const au = auInput.value || null;
+            const lat = latInput.value ? parseFloat(latInput.value) : null;
+            const lon = lonInput.value ? parseFloat(lonInput.value) : null;
+            const rayon = rayonSelect.value ? parseFloat(rayonSelect.value) : null;
+
+            const filtered = allUpcoming.filter((c) => {
+                if (du && c.date < du) return false;
+                if (au && c.date > au) return false;
+                if (rayon && lat != null && lon != null) {
+                    if (c.latitude == null || c.longitude == null) return false;
+                    if (distanceKm(lat, lon, c.latitude, c.longitude) > rayon) return false;
+                }
+                return true;
+            });
+
+            upcomingList.innerHTML = '';
+            if (!filtered.length) {
+                upcomingList.innerHTML = '<li class="concerts-empty">Aucune date ne correspond à ces critères.</li>';
+                return;
+            }
+            filtered.forEach((c) => upcomingList.appendChild(buildItem(c, true)));
+        }
+
+        [duInput, auInput, rayonSelect].forEach((el) => el.addEventListener('change', applyFilters));
+
+        document.getElementById('btnReset').addEventListener('click', () => {
+            duInput.value = '';
+            auInput.value = '';
+            villeInput.value = '';
+            latInput.value = '';
+            lonInput.value = '';
+            rayonSelect.value = '';
+            applyFilters();
+        });
+
+        document.getElementById('btnMaPosition').addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                alert("La géolocalisation n'est pas disponible sur ce navigateur.");
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    latInput.value = pos.coords.latitude;
+                    lonInput.value = pos.coords.longitude;
+                    villeInput.value = 'Ma position';
+                    if (!rayonSelect.value) rayonSelect.value = '100';
+                    applyFilters();
+                },
+                () => alert("Impossible de récupérer ta position.")
+            );
+        });
+
+        // Autocomplétion de la ville de référence (même API que l'admin)
+        let debounceTimer = null;
+        villeInput.addEventListener('input', () => {
+            const value = villeInput.value.trim();
+            latInput.value = '';
+            lonInput.value = '';
+
+            clearTimeout(debounceTimer);
+            if (value.length < 2) {
+                suggestionsList.hidden = true;
+                suggestionsList.innerHTML = '';
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const url = `https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(value)}&fields=nom,codesPostaux,centre&boost=population&limit=10`;
+                    const res = await fetch(url);
+                    const communes = await res.json();
+                    renderSuggestions(communes);
+                } catch (err) {
+                    suggestionsList.hidden = true;
+                }
+            }, 300);
+        });
+
+        function renderSuggestions(communes) {
+            suggestionsList.innerHTML = '';
+            if (!communes.length) {
+                suggestionsList.hidden = true;
+                return;
+            }
+            communes.forEach((commune) => {
+                const li = document.createElement('li');
+                li.textContent = `${commune.nom} (${commune.codesPostaux.join(', ')})`;
+                li.addEventListener('click', () => {
+                    villeInput.value = commune.nom;
+                    if (commune.centre && commune.centre.coordinates) {
+                        lonInput.value = commune.centre.coordinates[0];
+                        latInput.value = commune.centre.coordinates[1];
+                    }
+                    suggestionsList.hidden = true;
+                    suggestionsList.innerHTML = '';
+                    if (!rayonSelect.value) rayonSelect.value = '100';
+                    applyFilters();
+                });
+                suggestionsList.appendChild(li);
+            });
+            suggestionsList.hidden = false;
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.city-autocomplete-wrap')) {
+                suggestionsList.hidden = true;
+            }
+        });
+    </script>
+
+</body>
+
+</html>

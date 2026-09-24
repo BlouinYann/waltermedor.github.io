@@ -5,8 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Admin — StagePanel</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../scripts.js" defer></script>
 </head>
+
 <body class="admin-page">
+  
   <div class="loading-gate" id="loadingGate">Vérification de la session…</div>
 
   <div class="admin-wrap" id="appWrap" style="display:none;">
@@ -26,11 +29,21 @@
           <label for="date">Date</label>
           <input type="date" id="date" required>
         </div>
-        <div class="auth-field">
+        <div class="auth-field city-autocomplete-wrap">
           <label for="ville">Ville</label>
-          <input type="text" id="ville" placeholder="Nantes" required>
+          <input type="text" id="ville" placeholder="Commence à taper..." autocomplete="off" required>
+          <input type="hidden" id="codeInsee">
+          <input type="hidden" id="latitude">
+          <input type="hidden" id="longitude">
+          <ul class="city-suggestions" id="citySuggestions" hidden></ul>
         </div>
         <div class="auth-field">
+          <label for="codePostal">Code postal</label>
+          <select id="codePostal" required>
+            <option value="" disabled selected>Choisis d'abord une ville</option>
+          </select>
+        </div>
+        <div class="auth-field full">
           <label for="salle">Salle</label>
           <input type="text" id="salle" placeholder="Le Ferrailleur">
         </div>
@@ -53,7 +66,7 @@
       <h2>Dates de concert</h2>
       <table class="admin-table">
         <thead>
-          <tr><th>Date</th><th>Ville</th><th>Salle</th><th>Statut</th><th></th></tr>
+          <tr><th>Date</th><th>Ville</th><th>CP</th><th>Salle</th><th>Statut</th><th></th></tr>
         </thead>
         <tbody id="concertRows"></tbody>
       </table>
@@ -97,7 +110,11 @@
     function resetForm() {
       form.reset();
       document.getElementById('concertId').value = '';
+      document.getElementById('codeInsee').value = '';
+      document.getElementById('latitude').value = '';
+      document.getElementById('longitude').value = '';
       document.getElementById('publie').checked = true;
+      resetCodePostalSelect();
       formTitle.textContent = 'Ajouter une date de concert';
       cancelEditBtn.style.display = 'none';
     }
@@ -110,6 +127,10 @@
       const data = {
         date: document.getElementById('date').value,
         ville: document.getElementById('ville').value.trim(),
+        codePostal: document.getElementById('codePostal').value,
+        codeInsee: document.getElementById('codeInsee').value,
+        latitude: document.getElementById('latitude').value ? parseFloat(document.getElementById('latitude').value) : null,
+        longitude: document.getElementById('longitude').value ? parseFloat(document.getElementById('longitude').value) : null,
         salle: document.getElementById('salle').value.trim(),
         lien: document.getElementById('lien').value.trim(),
         publie: document.getElementById('publie').checked
@@ -126,13 +147,101 @@
       document.getElementById('concertId').value = c.id;
       document.getElementById('date').value = c.date || '';
       document.getElementById('ville').value = c.ville || '';
+      document.getElementById('codeInsee').value = c.codeInsee || '';
+      document.getElementById('latitude').value = c.latitude != null ? c.latitude : '';
+      document.getElementById('longitude').value = c.longitude != null ? c.longitude : '';
       document.getElementById('salle').value = c.salle || '';
       document.getElementById('lien').value = c.lien || '';
       document.getElementById('publie').checked = !!c.publie;
+
+      // Reconstruit l'option du code postal existant (même si on n'a pas
+      // re-interrogé l'API, on garde au moins la valeur déjà enregistrée)
+      resetCodePostalSelect();
+      if (c.codePostal) {
+        const select = document.getElementById('codePostal');
+        select.innerHTML = `<option value="${c.codePostal}" selected>${c.codePostal}</option>`;
+      }
+
       formTitle.textContent = 'Modifier la date';
       cancelEditBtn.style.display = 'inline-block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // --- Autocomplétion des villes (API geo.api.gouv.fr, gratuite, sans clé) ---
+    const villeInput = document.getElementById('ville');
+    const suggestionsList = document.getElementById('citySuggestions');
+    const codePostalSelect = document.getElementById('codePostal');
+    let debounceTimer = null;
+
+    function resetCodePostalSelect() {
+      codePostalSelect.innerHTML = '<option value="" disabled selected>Choisis d\'abord une ville</option>';
+    }
+
+    villeInput.addEventListener('input', () => {
+      const value = villeInput.value.trim();
+      document.getElementById('codeInsee').value = '';
+      resetCodePostalSelect();
+
+      clearTimeout(debounceTimer);
+      if (value.length < 2) {
+        suggestionsList.hidden = true;
+        suggestionsList.innerHTML = '';
+        return;
+      }
+
+      debounceTimer = setTimeout(async () => {
+        try {
+          const url = `https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(value)}&fields=nom,code,codesPostaux,centre&boost=population&limit=10`;
+          const res = await fetch(url);
+          const communes = await res.json();
+          renderSuggestions(communes);
+        } catch (err) {
+          suggestionsList.hidden = true;
+        }
+      }, 300);
+    });
+
+    function renderSuggestions(communes) {
+      suggestionsList.innerHTML = '';
+      if (!communes.length) {
+        suggestionsList.hidden = true;
+        return;
+      }
+      communes.forEach((commune) => {
+        const li = document.createElement('li');
+        li.textContent = `${commune.nom} (${commune.codesPostaux.join(', ')})`;
+        li.addEventListener('click', () => selectCommune(commune));
+        suggestionsList.appendChild(li);
+      });
+      suggestionsList.hidden = false;
+    }
+
+    function selectCommune(commune) {
+      villeInput.value = commune.nom;
+      document.getElementById('codeInsee').value = commune.code;
+      if (commune.centre && commune.centre.coordinates) {
+        document.getElementById('longitude').value = commune.centre.coordinates[0];
+        document.getElementById('latitude').value = commune.centre.coordinates[1];
+      }
+      suggestionsList.hidden = true;
+      suggestionsList.innerHTML = '';
+
+      codePostalSelect.innerHTML = '';
+      commune.codesPostaux.forEach((cp, i) => {
+        const opt = document.createElement('option');
+        opt.value = cp;
+        opt.textContent = cp;
+        if (i === 0) opt.selected = true;
+        codePostalSelect.appendChild(opt);
+      });
+    }
+
+    // Ferme la liste si on clique ailleurs
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.city-autocomplete-wrap')) {
+        suggestionsList.hidden = true;
+      }
+    });
 
     async function deleteConcert(id) {
       if (!confirm('Supprimer définitivement cette date ?')) return;
@@ -159,6 +268,7 @@
           tr.innerHTML = `
             <td>${formatDate(c.date)}</td>
             <td>${escapeHtml(c.ville || '')}</td>
+            <td>${escapeHtml(c.codePostal || '')}</td>
             <td>${escapeHtml(c.salle || '')}</td>
             <td><span class="badge ${c.publie ? 'badge-live' : 'badge-draft'}">${c.publie ? 'Publié' : 'Brouillon'}</span></td>
             <td class="actions">

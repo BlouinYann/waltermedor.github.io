@@ -1202,3 +1202,631 @@ nav ul li.dropdown:hover .submenu {
     width: 24px;
     height: 24px;
 }
+/* ============================================================
+   PAGES ADMIN / CONNEXION (StagePanel) — v2
+   -> Remplace ENTIÈREMENT le bloc "style-admin-addon.css" précédent
+   dans ton style.css (supprime l'ancien bloc, colle celui-ci à la place).
+   Corrections : contraste des titres/labels, inputs stylés de façon
+   fiable (indépendants du rendu natif du navigateur), police lisible
+   pour les champs de saisie (mot de passe notamment).
+   ============================================================ */
+
+/* --- Page de connexion --- */
+.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.auth-container {
+    width: min(420px, 100%);
+    text-align: center;
+}
+
+.auth-brand h1 {
+    font-family: var(--font-title);
+    color: var(--color-white);
+    font-size: 2rem;
+    margin: 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.auth-brand p {
+    font-family: var(--font-subtitle);
+    color: var(--color-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 12px 0 0;
+}
+
+.auth-card {
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid var(--color-primary);
+    border-radius: 6px;
+    padding: 34px 28px;
+    margin-top: 28px;
+}
+
+.auth-card h3 {
+    font-family: var(--font-title);
+    color: var(--color-white);
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+    margin: 0 0 14px;
+}
+
+.auth-card > p {
+    font-family: var(--font-subtitle);
+    color: var(--color-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0 0 24px;
+}
+
+.auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.auth-field label {
+    font-family: var(--font-subtitle);
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    text-transform: lowercase;
+    color: var(--color-white);
+    opacity: 0.85;
+}
+
+/* Champs de saisie : police lisible dédiée (PAS la police d'affichage
+   du site), fond opaque et bordure nette pour rester visibles quel
+   que soit le rendu natif du navigateur (date, url, texte...). */
+.auth-field input,
+.concert-form input[type="text"],
+.concert-form input[type="date"],
+.concert-form input[type="url"] {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-secondary);
+    border-radius: 4px;
+    color: var(--color-white);
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+    padding: 11px 12px;
+    outline: none;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.auth-field input::placeholder,
+.concert-form input::placeholder {
+    color: rgba(230, 226, 223, 0.4);
+    font-family: 'Courier New', Consolas, monospace;
+}
+
+.auth-field input:focus,
+.concert-form input:focus {
+    border-color: var(--color-white);
+    background: rgba(0, 0, 0, 0.55);
+}
+
+/* Icône du sélecteur de date native : trop sombre par défaut sur fond
+   sombre, on l'éclaircit pour qu'elle reste visible. */
+.concert-form input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.85);
+    cursor: pointer;
+}
+
+.auth-password-wrap {
+    position: relative;
+}
+
+.auth-password-wrap input {
+    padding-right: 44px;
+}
+
+.auth-toggle-password {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    color: var(--color-secondary);
+    cursor: pointer;
+    padding: 0;
+}
+
+.auth-toggle-password svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.auth-toggle-password:hover { color: var(--color-white); background: rgba(255,255,255,0.06); }
+.auth-toggle-password .icon-eye-off { display: none; }
+.auth-toggle-password.is-visible .icon-eye { display: none; }
+.auth-toggle-password.is-visible .icon-eye-off { display: block; }
+
+.auth-submit {
+    width: 100%;
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    padding: 14px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.auth-submit:hover:not(:disabled) { background: var(--color-secondary); color: #000; }
+.auth-submit:active:not(:disabled) { transform: scale(0.98); }
+.auth-submit:disabled { opacity: 0.6; cursor: wait; }
+
+.auth-hint {
+    font-family: var(--font-subtitle);
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: rgba(230, 226, 223, 0.5);
+    line-height: 1.5;
+}
+
+.auth-error-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    text-align: left;
+    background: rgba(150, 60, 60, 0.18);
+    border: 1px solid rgba(150, 60, 60, 0.6);
+    color: #f0c4c4;
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin: 0 0 20px;
+    font-family: var(--font-subtitle);
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.auth-error-banner svg {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    color: #e08a8a;
+    display: block;
+}
+
+/* Sécurité supplémentaire : l'attribut HTML natif [hidden] masque
+   toujours l'élément, même si ce fichier CSS ne charge pas du tout. */
+[hidden] { display: none !important; }
+
+/* --- Page admin --- */
+.admin-page { min-height: 100vh; padding: 32px 20px 60px; }
+.admin-wrap { max-width: 900px; margin: 0 auto; }
+
+.admin-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--color-primary);
+}
+
+.admin-topbar h1 {
+    font-family: var(--font-title);
+    color: var(--color-white);
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.admin-who {
+    font-family: var(--font-subtitle);
+    color: var(--color-secondary);
+    font-size: 0.85rem;
+}
+
+.admin-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-primary);
+    border-radius: 6px;
+    padding: 26px;
+    margin-bottom: 28px;
+}
+
+.admin-card h2 {
+    font-family: var(--font-title);
+    color: var(--color-white);
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+    margin: 0 0 20px;
+    padding: 0;
+    text-align: left;
+    background: none;
+    mix-blend-mode: normal;
+    width: auto;
+}
+
+.btn {
+    border: 0;
+    border-radius: 3px;
+    padding: 10px 18px;
+    font-family: var(--font-subtitle);
+    letter-spacing: 1px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn-gold { background: var(--color-primary); color: var(--color-white); }
+.btn-gold:hover { background: var(--color-secondary); color: #000; }
+.btn-ghost { background: rgba(255, 255, 255, 0.08); color: var(--color-white); border: 1px solid rgba(230, 226, 223, 0.3); }
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.15); }
+.btn-danger { background: rgba(150, 60, 60, 0.2); color: #f0c4c4; border: 1px solid rgba(150, 60, 60, 0.6); }
+.btn-danger:hover { background: rgba(150, 60, 60, 0.35); }
+.btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+
+.concert-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.concert-form .full { grid-column: 1 / -1; }
+
+.concert-form .field-check {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.concert-form .field-check input { width: 18px; height: 18px; accent-color: var(--color-secondary); }
+.concert-form .field-check label {
+    font-family: var(--font-body);
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.95rem;
+    color: var(--color-white);
+}
+
+.form-actions { grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 4px; }
+
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th, .admin-table td {
+    text-align: left;
+    padding: 12px 10px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--color-white);
+    border-bottom: 1px solid rgba(99, 81, 67, 0.3);
+}
+.admin-table th {
+    font-family: var(--font-subtitle);
+    color: var(--color-secondary);
+    font-weight: normal;
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    text-transform: lowercase;
+}
+.admin-table td.actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-family: var(--font-subtitle);
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+}
+.badge-live { background: rgba(99, 81, 67, 0.35); color: var(--color-white); }
+.badge-draft { background: rgba(255, 255, 255, 0.1); color: rgba(230, 226, 223, 0.6); }
+
+.admin-empty { color: rgba(230, 226, 223, 0.5); font-family: var(--font-subtitle); font-size: 0.9rem; padding: 20px 0; text-align: center; }
+
+.loading-gate {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-secondary);
+    font-family: var(--font-subtitle);
+    font-size: 0.95rem;
+    z-index: 50;
+}
+
+@media (max-width: 640px) {
+    .concert-form { grid-template-columns: 1fr; }
+    .admin-table td.actions { justify-content: flex-start; }
+}
+
+/* --- Section "Prochaines dates" (index.html) --- */
+.concerts-section { margin: 40px 0; }
+.concerts-list { list-style: none; padding: 0; margin: 20px 0 0; }
+.concert-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    font-family: var(--font-body);
+    border-bottom: 1px solid rgba(99, 81, 67, 0.3);
+}
+.concert-date { font-family: var(--font-subtitle); color: var(--color-secondary); min-width: 170px; }
+.concert-ville { flex: 1; }
+.concert-link {
+    font-family: var(--font-subtitle);
+    color: var(--color-white);
+    text-decoration: underline;
+    font-size: 0.85rem;
+}
+.concerts-empty { font-family: var(--font-subtitle); color: rgba(230, 226, 223, 0.5); padding: 14px 0; }
+.city-autocomplete-wrap { position: relative; }
+ 
+.city-suggestions {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    max-height: 220px;
+    overflow-y: auto;
+    background: #14100d;
+    border: 1px solid var(--color-secondary);
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+ 
+.city-suggestions li {
+    padding: 9px 12px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.92rem;
+    color: var(--color-white);
+    cursor: pointer;
+}
+ 
+.city-suggestions li:hover {
+    background: rgba(99, 81, 67, 0.35);
+}
+ 
+/* Le select de code postal reprend le même style que les autres champs */
+#codePostal {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-secondary);
+    border-radius: 4px;
+    color: var(--color-white);
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1rem;
+    padding: 11px 12px;
+    outline: none;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+}
+ 
+#codePostal:focus { border-color: var(--color-white); }
+ 
+#codePostal option {
+    background: #14100d;
+    color: var(--color-white);
+}
+/* ============================================================
+   PAGE DATES (dates.html)
+   ============================================================ */
+
+.dates-section {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Titres de sous-sections : plus clairs pour ressortir sur le fond */
+.dates-subtitle {
+    font-family: var(--font-title);
+    color: #c2ad86;
+    font-size: 1.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    margin: 40px 0 6px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-secondary);
+}
+
+.dates-subtitle-past { color: #a89573; }
+
+/* --- Filtres : bloc compact, fond plus sombre pour la lisibilité --- */
+.dates-filters {
+    background: rgba(12, 10, 8, 0.82);
+    border: 1px solid var(--color-secondary);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-top: 20px;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.filters-grid .form-group { margin-bottom: 0; }
+
+.filters-grid .form-group label {
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+    color: #c2ad86;
+}
+
+.filters-grid .form-group input,
+.filters-grid .form-group select {
+    font-size: 1rem;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border-bottom: 2px solid var(--color-secondary);
+    color: var(--color-white);
+    color-scheme: dark; /* icône calendrier claire */
+}
+
+.filters-grid .form-group input::placeholder {
+    color: rgba(230, 226, 223, 0.6);
+}
+
+.filters-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.filters-btn {
+    width: auto;
+    margin-top: 0;
+    padding: 7px 14px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    background: var(--color-secondary);
+    color: #14100d;
+}
+
+.filters-btn:hover { background: #c2ad86; }
+
+.filters-reset {
+    background: none;
+    border: none;
+    color: #c2ad86;
+    font-family: var(--font-subtitle);
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+}
+
+.filters-reset:hover { color: var(--color-white); }
+
+@media (max-width: 768px) {
+    .filters-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+    .filters-grid { grid-template-columns: 1fr; }
+}
+
+/* --- Liste des dates : plus grande et plus lisible --- */
+.dates-section .concert-item {
+    padding: 20px 0;
+    gap: 16px;
+    border-bottom: 1px solid rgba(147, 128, 95, 0.5);
+}
+
+.dates-section .concert-date {
+    font-size: 1.7rem;
+    color: #c2ad86;
+    min-width: 300px;
+}
+
+.dates-section .concert-ville {
+    font-size: 1.9rem;
+    letter-spacing: 1px;
+    color: var(--color-white);
+}
+
+.dates-section .concert-link {
+    font-size: 1.05rem;
+    color: var(--color-white);
+    padding: 6px 14px;
+    border: 1px solid var(--color-secondary);
+    border-radius: 3px;
+    text-decoration: none;
+}
+
+.dates-section .concert-link:hover {
+    background: var(--color-secondary);
+    color: #14100d;
+}
+
+.dates-section .concerts-empty {
+    font-size: 1.05rem;
+    color: rgba(230, 226, 223, 0.75);
+}
+
+/* Dates passées : atténuées, mais toujours lisibles */
+.concerts-list-past .concert-item { opacity: 0.75; }
+.concerts-list-past .concert-date { color: rgba(230, 226, 223, 0.7); }
+
+/* Dates passées : plus compactes que les dates à venir */
+.dates-section .concerts-list-past .concert-item { padding: 12px 0; gap: 12px; }
+.dates-section .concerts-list-past .concert-date { font-size: 1.2rem; min-width: 250px; }
+.dates-section .concerts-list-past .concert-ville { font-size: 1.45rem; }
+
+@media (max-width: 600px) {
+    .dates-section .concert-date { min-width: 0; width: 100%; }
+    .dates-section .concert-ville { font-size: 1.6rem; }
+}
+
+/* --- Prochaines dates sur la page d'accueil : même rendu que la page Dates --- */
+.concerts-section .concert-item {
+    padding: 20px 0;
+    gap: 16px;
+    border-bottom: 1px solid rgba(147, 128, 95, 0.5);
+}
+
+.concerts-section .concert-date {
+    font-size: 1.7rem;
+    color: #c2ad86;
+    min-width: 300px;
+}
+
+.concerts-section .concert-ville {
+    font-size: 1.9rem;
+    letter-spacing: 1px;
+    color: var(--color-white);
+}
+
+.concerts-section .concert-link {
+    font-size: 1.05rem;
+    color: var(--color-white);
+    padding: 6px 14px;
+    border: 1px solid var(--color-secondary);
+    border-radius: 3px;
+    text-decoration: none;
+}
+
+.concerts-section .concert-link:hover {
+    background: var(--color-secondary);
+    color: #14100d;
+}
+
+.concerts-section .concerts-empty {
+    font-size: 1.05rem;
+    color: rgba(230, 226, 223, 0.75);
+}
+
+@media (max-width: 600px) {
+    .concerts-section .concert-date { min-width: 0; width: 100%; font-size: 1.4rem; }
+    .concerts-section .concert-ville { font-size: 1.6rem; }
+}

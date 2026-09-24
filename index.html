@@ -43,11 +43,59 @@
                 <button class="next" onclick="moveSlide(1)">&#10095;</button>
             </div>
         </section>
+
+        <section class="concerts-section">
+            <h2>Prochaines dates</h2>
+            <ul class="concerts-list" id="concertsList">
+                <li class="concerts-empty">Chargement des dates…</li>
+            </ul>
+        </section>
     </main>
 
     <footer id="main-footer">
         <p>&copy; 2026 Walter Medor</p>
     </footer>
+
+    <script type="module">
+        import { db, collection, query, where, orderBy, onSnapshot } from './firebase-init.js';
+
+        const list = document.getElementById('concertsList');
+        const today = new Date().toISOString().slice(0, 10);
+
+        const q = query(
+            collection(db, 'concerts'),
+            where('publie', '==', true),
+            where('date', '>=', today),
+            orderBy('date', 'asc')
+        );
+
+        onSnapshot(q, (snapshot) => {
+            list.innerHTML = '';
+            if (snapshot.empty) {
+                list.innerHTML = '<li class="concerts-empty">Aucune date programmée pour le moment.</li>';
+                return;
+            }
+            snapshot.forEach((docSnap) => {
+                const c = docSnap.data();
+                const d = new Date(c.date + 'T00:00:00');
+                const dateStr = d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+                const li = document.createElement('li');
+                li.className = 'concert-item';
+                li.innerHTML = `
+                    <span class="concert-date">${dateStr}</span>
+                    <span class="concert-ville">${escapeHtml(c.ville || '')}${c.codePostal ? ' (' + escapeHtml(c.codePostal) + ')' : ''}${c.salle ? ' — ' + escapeHtml(c.salle) : ''}</span>
+                    ${c.lien ? `<a class="concert-link" href="${escapeHtml(c.lien)}" target="_blank" rel="noopener">Billetterie</a>` : ''}
+                `;
+                list.appendChild(li);
+            });
+        });
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
 
 </body>
 
