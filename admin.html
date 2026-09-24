@@ -6,6 +6,20 @@
   <title>Admin — StagePanel</title>
   <link rel="stylesheet" href="../style.css">
   <script src="../scripts.js" defer></script>
+  <style>
+    .dup-warning {
+      border: 1px solid #c2ad86;
+      border-left: 5px solid #d9a441;
+      background: rgba(217, 164, 65, 0.12);
+      border-radius: 6px;
+      padding: 14px 16px;
+    }
+    .dup-warning p { margin: 0 0 8px; }
+    .dup-title { font-weight: bold; color: #e8c375; }
+    .dup-list { margin: 0 0 10px; padding-left: 20px; }
+    .dup-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .dup-actions .btn { flex: 1 1 220px; }
+  </style>
 </head>
 
 <body class="admin-page">
@@ -54,6 +68,15 @@
         <div class="field-check">
           <input type="checkbox" id="publie" checked>
           <label for="publie">Visible sur le site public</label>
+        </div>
+        <div class="full dup-warning" id="dupWarning" hidden>
+          <p class="dup-title">Attention : un concert est déjà enregistré à cette date</p>
+          <ul class="dup-list" id="dupList"></ul>
+          <p>Est-ce le même évènement ?</p>
+          <div class="dup-actions">
+            <button type="button" class="btn btn-gold" id="dupConfirmBtn">Non, autre évènement : enregistrer</button>
+            <button type="button" class="btn btn-ghost" id="dupCancelBtn">Oui, même évènement : ne pas enregistrer</button>
+          </div>
         </div>
         <div class="form-actions">
           <button type="submit" class="btn btn-gold" id="saveBtn">Enregistrer</button>
@@ -106,8 +129,11 @@
     const formTitle = document.getElementById('formTitle');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
     const concertsCol = collection(db, 'concerts');
+    let pendingSave = null; // enregistrement en attente de confirmation (doublon)
+    let allConcerts = []; // mis à jour en temps réel, sert à détecter les doublons de date
 
     function resetForm() {
+      hideDupWarning();
       form.reset();
       document.getElementById('concertId').value = '';
       document.getElementById('codeInsee').value = '';
@@ -135,13 +161,57 @@
         lien: document.getElementById('lien').value.trim(),
         publie: document.getElementById('publie').checked
       };
+      // Doublon : un autre concert existe déjà à cette date ?
+      const doublons = allConcerts.filter((c) => c.date === data.date && c.id !== id);
+      if (doublons.length) {
+        pendingSave = { id, data };
+        showDupWarning(doublons);
+        return;
+      }
+      await saveConcert(id, data);
+    });
+
+    async function saveConcert(id, data) {
       if (id) {
         await updateDoc(doc(db, 'concerts', id), data);
       } else {
         await addDoc(concertsCol, data);
       }
       resetForm();
+    }
+
+    // --- Avertissement doublon : affiché dans la page (pas de pop-up) ---
+    const dupWarning = document.getElementById('dupWarning');
+    const dupList = document.getElementById('dupList');
+
+    function showDupWarning(doublons) {
+      dupList.innerHTML = '';
+      doublons.forEach((c) => {
+        const li = document.createElement('li');
+        li.textContent = `${formatDate(c.date)} — ${c.ville || '?'}${c.salle ? ' (' + c.salle + ')' : ''}`;
+        dupList.appendChild(li);
+      });
+      dupWarning.hidden = false;
+      dupWarning.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function hideDupWarning() {
+      pendingSave = null;
+      dupWarning.hidden = true;
+    }
+
+    document.getElementById('dupConfirmBtn').addEventListener('click', async () => {
+      if (!pendingSave) return;
+      const { id, data } = pendingSave;
+      dupWarning.hidden = true;
+      pendingSave = null;
+      await saveConcert(id, data);
     });
+
+    document.getElementById('dupCancelBtn').addEventListener('click', hideDupWarning);
+
+    // Si la date change, l'avertissement n'a plus lieu d'être
+    document.getElementById('date').addEventListener('input', hideDupWarning);
 
     function editConcert(c) {
       document.getElementById('concertId').value = c.id;
@@ -250,8 +320,11 @@
 
     // --- Liste en temps réel ---
     function startListening() {
-      const q = query(concertsCol, orderBy('date', 'asc'));
+      const q = query(concertsCol, orderBy('date', 'desc'));
       onSnapshot(q, (snapshot) => {
+        allConcerts = snapshot.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .sort((x, y) => (y.date || '').localeCompare(x.date || '')); // plus récente en haut
         const rows = document.getElementById('concertRows');
         const emptyState = document.getElementById('emptyState');
         rows.innerHTML = '';
@@ -262,8 +335,7 @@
         }
         emptyState.style.display = 'none';
 
-        snapshot.forEach((docSnap) => {
-          const c = { id: docSnap.id, ...docSnap.data() };
+        allConcerts.forEach((c) => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${formatDate(c.date)}</td>
